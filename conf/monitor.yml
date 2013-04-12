@@ -1,0 +1,9 @@
+DBI:
+  - "DBI:mysql:database=findmjob:mysql_enable_utf8=1"
+  - "xxx"
+  - "yyy"
+  -
+    AutoCommit: 1
+    PrintError: 1
+    RaiseError: 1
+
