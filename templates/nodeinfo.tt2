@@ -9,6 +9,9 @@
             </div><!--/.well -->
           </div><!--/span-->
           <div class="span9">
+            <h4>主机IP [% node_info.monitor_ip %] </h4>
+            <h4>监控端口 [% node_info.monitor_port %] </h4>
+            <hr class="bs-docs-separator">
             <h3>主机磁盘信息</h3>
             <hr class="bs-docs-separator">
             <table class="table table-striped table-hover table-condensed">

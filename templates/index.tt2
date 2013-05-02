@@ -25,4 +25,4 @@
         </div>
 		[% content %]
     </div>    
-    <script type="text/javascript" src="[% public_resource %]/monitorapp.dart.js"></script></body></html>
+    <!--<script type="text/javascript" src="[% public_resource %]/monitorapp.dart.js"></script>--></body></html>

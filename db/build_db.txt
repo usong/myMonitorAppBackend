@@ -1,37 +1,72 @@
-create table nodes (	
-	index_key     varchar(32),
-	monitor_ip    varchar(15),
-	monitor_port  numeric,  
-	alias         varchar(20),
-	inserted_times varchar(14),
+/* 节点表 */
+create table nodes(	
+	node_index      VARCHAR2(32),
+	monitor_ip      VARCHAR2(15),
+	monitor_port    NUMBER(6),  
+	alias           VARCHAR2(20),
+	inserted_times  VARCHAR2(14)
 );
 
-
-create table node_info (
-	index_key   varchar(32),
-);
-
+/* 节点基础信息一览 */
 create table node_system_info (
-	index_key	      varchar(32),
-	cpu_num           numeric,
-	cpu_process_info  varchar(32),
-    opsys_info        vachar(32),
-	mm_num 		      numeric,
-	mm_size			  varchar(12),
-	mm_free_size      varchar(12),
-	hd_size           varchar(32),
-	hd_num			  numeric,
-	hd_free_size    numeric,
-	hd_no             varchar(10),
-	hd_no_size        numeric,
-	hd_free_size      numeric,
+	node_index	  VARCHAR2(32),            /* 监控节点唯一索引 */
+	cpu_num           NUMBER(6),               /* cpu 个数 */
+	cpu_process_info  VARCHAR2(32),            /* cpu 处理器型号信息 */
+        opsys_info        VARCHAR2(32),            /*  主机操作系统信息 */
+	mm_size		  VARCHAR2(12),    	   /*  主机内存 */
+	mm_free_size      VARCHAR2(12),            /* 可用内存 */
+	hd_size           VARCHAR2(12),            /* 磁盘总空间  */
+	hd_free_size      VARCHAR2(12)            /* 磁盘剩余空间 */
 );
-
+/* 磁盘信息 */
 create table node_hd_info (
-	index_key	      varchar(32),
-	hd_no             varchar(10),
-	hd_no_size        numeric,
-	hd_free_size      numeric,
-	hd_in
+	node_index	  VARCHAR2(32),     /* 监控节点唯一索引 */
+	hd_no             VARCHAR2(32),     /* 挂接点名称 */
+	hd_no_size        VARCHAR2(12),     /* 挂接点大小 */
+	hd_used_size      VARCHAR2(12),     /* 挂接点大小 */
+	hd_free_size      VARCHAR2(12),     /* 挂接点剩余大小 */
+	monitor_threhold  VARCHAR2(6) /* 报警阀值百分比 */
 );
-blahblahblah
+/* 进程信息 */
+create table node_process_info (
+	node_index	  VARCHAR2(32), /* 监控节点唯一索引 */
+	process_no        VARCHAR2(20), /* 进程名称 */
+	process_status    VARCHAR2(5),  /* 进程状态 */
+	process_runnum    NUMBER(3),     /* 运行个数 */
+	process_setnum    NUMBER(3)     /* 设置个数 */
+)
+
+/* 节点备份结果 */
+create table node_backup_info (
+	node_index	  VARCHAR2(32),  /* 监控节点唯一索引 */
+	backup_time       VARCHAR2(15),  /* 定时备份时间 */
+	backup_ftp        VARCHAR2(20),   /* 备份上送FTP */
+	backup_param      VARCHAR2(1024), /* 备份下发参数  */
+	backup_desc       VARCHAR2(512)   /* 备份结果 */
+)
+
+/*create db script*/
+
+create temporary tablespace sysmonitor_temp
+tempfile '/oradata/oradata/devdb/sysmonitor_temp.dbf'
+size 32m
+autoextend on
+next 32m maxsize 2048m
+extent management local; 
+
+create tablespace sysmonitor_data
+logging
+datafile '/oradata/oradata/devdb/sysmonitor_data.dbf'
+size 32m
+autoextend on
+next 32m maxsize 2048m
+extent management local; 
+
+create user sysmonitor identified by sysmonitor
+default tablespace sysmonitor_data
+temporary tablespace sysmonitor_temp; 
+
+grant connect,resource to sysmonitor; 
+
+
+

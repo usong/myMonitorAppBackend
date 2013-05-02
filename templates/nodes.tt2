@@ -1,11 +1,20 @@
 <!-- thumbnails div -->
 <div class="row-fluid">
-  <ul class="thumbnails" id="mythumbnails">              
-  </ul>  
-</div> 
-<div class="pagination pagination-centered" id="pagination_slide">
-  <ul id="pg_ul">
-  </ul>
+	<ul class="thumbnails" id="mythumbnails">  
+	[% FOREACH node IN nodes %]
+	  <li class='span3' id='li[% node.node_index %]'>
+	      <div class='thumbnail' id='thumbnail[% node.node_index %]'>
+                  <div class='imgclass' id='closeicon[% node.node_index %]'>
+			  <div class='mycircle_out_class' id='mycircle[% node.node_index %]'>
+				  <img id='imgclose[% node.node_index %]' src='[% public_resource %]/img/del.png' style='display:none ;width: 18px; height: 18px'></img>
+			  </div>
+	         </div>
+            	 <img src='[% public_resource %]/img/add.png' style='width: 180px; height: 180px'>
+		 <a href="[% public_resource %]/node_view/[% node.node_index %]"><div class='caption'><p class="text-info">[% node.alias %]</p></div></a>
+	      </div>
+	      </li>
+	[% END %]
+	</ul>
 </div> 
 
 <div id="x-modal-div" style="display : none">
