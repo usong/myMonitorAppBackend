@@ -33,5 +33,4 @@ create table node_hd_info (
 	hd_no_size        numeric,
 	hd_free_size      numeric,
 	hd_in
-);
-blahblahblah
+);;
