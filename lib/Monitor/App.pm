@@ -17,7 +17,27 @@ hook before_template_render => sub {
     my $tokens = shift;
 	$tokens->{public_resource} =  request->uri_base ;
 };
+
 any '/' => sub {
+    	
+    my $schema = Util::Basic->schema;
+    my $job_rs = $schema->resultset('Nodes')->search( undef, {
+        order_by => 'inserted_times DESC',
+        rows => 6,
+        page => 1,
+    });
+    var nodes  => [$job_rs->all];
+    var nodes_pager => $job_rs->pager;
+    my $freelance_rs = $schema->resultset('Freelance')->search( undef, {
+        order_by => 'inserted_at DESC',
+        rows => 6,
+        page => 1,
+    });
+    var freelances => [$freelance_rs->all];
+    var freelances_pager => $freelance_rs->pager;
+
+    template 'index.tt2';
+
     template 'nodes.tt2';
 };
 
