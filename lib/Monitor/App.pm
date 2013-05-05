@@ -72,10 +72,9 @@ get '/node_view/:nodeid' => sub {
     			node_index => $nodeid ,
   		});
 
-		dump ( $node );
    		template 'nodeinfo.tt2',
 		{
-     		    'node_info'           =>  $node ,
+     		    'node_info'           =>  $node->first() ,
   		};	
 	}
 };
