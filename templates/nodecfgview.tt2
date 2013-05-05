@@ -1,0 +1,32 @@
+<div class="row-fluid">
+          <div class="span3">
+           <div class="well sidebar-nav">
+             <ul class="nav nav-list">
+                <li class="nav-header">Sidebar</li>
+                <li><a href="[% node_view %]/[% node_index %]">主机信息一览</a></li>
+                <li class="active"><a href="[% node_cfgview %]/[% node_index %]"">主机监控配置一览</a>
+					<ul>
+			  			<li><a href="[% hd_paramcfg_url %]/[% node_index %]">磁盘监控参数配置</a></li>
+			  			<li><a href="[% mm_paramcfg_url %]/[% node_index %]">内存监控参数配置</a></li>
+			  			<li><a href="[% process_paramcfg_url %]/[% node_index %]">进程监控参数配置<a>/l>
+		  				<li><a href="[% backup_paramcfg_url %]/[% node_index %]">备份参数配置</li>
+		  			</ul>
+				</li>
+              </ul>
+            </div><!--/.well -->
+          </div><!--/span-->
+          <div class="span9">
+		 	<p class="lead">主机IP:<span> [% node_info.monitor_ip %]</span> </p>
+		 	<p class="lead">监控端口:<span> [% node_info.monitor_port %]</span></p>
+            <hr class="bs-docs-separator">
+			[% FOREACH node IN node_servertypes %]
+
+			<label class="checkbox">
+      			<input type="checkbox"> [% %]
+   			</label>
+
+			[% END %]	
+            
+          </div>
+        </div><!-- row-fluid -->
+      
