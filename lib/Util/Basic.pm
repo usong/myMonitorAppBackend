@@ -34,13 +34,13 @@ sub _build_pdb {
     return $config; 
 }
 
-use Util::Schema;
-has 'schema' => ( is => 'ro' , lazy_build => 1 );
-sub _build_schema {
-	my $self = shift;	
-    my $schema = Util::Schema->connect( "dbi:Oracle:host=10.0.1.91;sid=devdb", "sysmonitor", "sysmonitor", '' , '' );
-	return $schema;
-}
+#use Util::Schema;
+#has 'schema' => ( is => 'ro' , lazy_build => 1 );
+#sub _build_schema {
+#	my $self = shift;	
+#    my $schema = Util::Schema->connect( "dbi:Oracle:host=10.0.1.91;sid=devdb", "sysmonitor", "sysmonitor", '' , '' );
+#	return $schema;
+#}
 
 1;
 

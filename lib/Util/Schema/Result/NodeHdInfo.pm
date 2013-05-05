@@ -47,17 +47,35 @@ __PACKAGE__->table("NODE_HD_INFO");
   is_nullable: 1
   size: 12
 
+=head2 hd_unused_size
+
+  data_type: 'varchar2'
+  is_nullable: 1
+  size: 12
+
 =head2 hd_free_size
 
   data_type: 'varchar2'
   is_nullable: 1
   size: 12
 
-=head2 monitor_threhold
+=head2 hd_threhold
 
   data_type: 'varchar2'
   is_nullable: 1
   size: 6
+
+=head2 hd_usepercent
+
+  data_type: 'varchar2'
+  is_nullable: 1
+  size: 6
+
+=head2 inserted_times
+
+  data_type: 'varchar2'
+  is_nullable: 1
+  size: 14
 
 =cut
 
@@ -70,15 +88,21 @@ __PACKAGE__->add_columns(
   { data_type => "varchar2", is_nullable => 1, size => 12 },
   "hd_used_size",
   { data_type => "varchar2", is_nullable => 1, size => 12 },
+  "hd_unused_size",
+  { data_type => "varchar2", is_nullable => 1, size => 12 },
   "hd_free_size",
   { data_type => "varchar2", is_nullable => 1, size => 12 },
-  "monitor_threhold",
+  "hd_threhold",
   { data_type => "varchar2", is_nullable => 1, size => 6 },
+  "hd_usepercent",
+  { data_type => "varchar2", is_nullable => 1, size => 6 },
+  "inserted_times",
+  { data_type => "varchar2", is_nullable => 1, size => 14 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-02 17:47:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:th5bFlelPAE9IAUHVFbGIA
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-03 22:37:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:e/UixrkyzR6DVnziGpDpYA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

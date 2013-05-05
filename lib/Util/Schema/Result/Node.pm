@@ -54,6 +54,20 @@ __PACKAGE__->table("NODES");
   is_nullable: 1
   size: 14
 
+=head2 running_status
+
+  data_type: 'numeric'
+  is_nullable: 1
+  original: {data_type => "number"}
+  size: [2,0]
+
+=head2 server_type
+
+  data_type: 'numeric'
+  is_nullable: 1
+  original: {data_type => "number"}
+  size: [2,0]
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -72,11 +86,25 @@ __PACKAGE__->add_columns(
   { data_type => "varchar2", is_nullable => 1, size => 20 },
   "inserted_times",
   { data_type => "varchar2", is_nullable => 1, size => 14 },
+  "running_status",
+  {
+    data_type => "numeric",
+    is_nullable => 1,
+    original => { data_type => "number" },
+    size => [2, 0],
+  },
+  "server_type",
+  {
+    data_type => "numeric",
+    is_nullable => 1,
+    original => { data_type => "number" },
+    size => [2, 0],
+  },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-02 17:52:59
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:NjWO1yHXDoKErz74CpWFMw
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-03 22:37:03
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:NtzRwNDoa/HRl19x3VQrsQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -53,6 +53,12 @@ __PACKAGE__->table("NODE_BACKUP_INFO");
   is_nullable: 1
   size: 512
 
+=head2 inserted_times
+
+  data_type: 'varchar2'
+  is_nullable: 1
+  size: 14
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -66,11 +72,13 @@ __PACKAGE__->add_columns(
   { data_type => "varchar2", is_nullable => 1, size => 1024 },
   "backup_desc",
   { data_type => "varchar2", is_nullable => 1, size => 512 },
+  "inserted_times",
+  { data_type => "varchar2", is_nullable => 1, size => 14 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-02 17:47:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5RISnaPgo3UX3DdE2nkC0w
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-03 22:37:04
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Xc3CdeaoPcS5U5dbK1dVRA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

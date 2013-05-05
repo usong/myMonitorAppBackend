@@ -15,13 +15,7 @@ set serializer => 'JSON';
 
 hook before_template_render => sub {
     my $tokens = shift;
-    $tokens->{public_resource}   =  request->uri_base ; /* uri_base */
-    $tokens->{node_view}   =  uri_for('/node_view');  /* node_information */
-    $tokens->{node_cfgview}   =  uri_for('/node_cfgview');  /* node_confg view */
-    $tokens->{hd_paramcfg_url}   =  uri_for('/hd_paramcfg');  /* hd_param */
-    $tokens->{mm_paramcfg_url}   =  uri_for('/mm_paramcfg');  /* mm_param */
-    $tokens->{process_paramcfg_url}   =  uri_for('/process_paramcfg');  /* process_param */
-    $tokens->{backup_paramcfg_url}   =  uri_for('/backup_paramcfg');  /* backup_param */
+    $tokens->{public_resource} =  request->uri_base ;
 };
 
 any '/' => sub {
@@ -67,45 +61,25 @@ any['get','post'] => '/node_getinfo' => sub {
 		return $hash->{'ip'};
 	}
 };
-get '/node_view/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+get '/node_view/:nodeid' => sub {
+	if ( params->{nodeid} =~ m/[\^@\#&!\$\+_ ].*/g ) {
 		forward "404.html" ;
 	}
 	else {
 		my $schema = Util::Basic->schema;
-		my $nodeindex =  params->{node_index} ;
+		my $nodeid =  params->{nodeid} ;
     		my $node = $schema->resultset('Node')->search({
-    			node_index => $nodeindex ,
+    			node_index => $nodeid ,
   		});
 			
 
    		template 'nodeinfo.tt2',
 		{
-     		'node_info'           =>  $node->first ,
-			'node_index'          =>  $nodeindex,
+     		    'node_info'           =>  $node->first ,
+		    'node_alias'          =>  $node->first,
   		};	
 	}
 };
-
-get '/node_cfgview/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
-		forward "404.html" ;
-	}
-	else {
-		my $schema = Util::Basic->schema;
-		my $nodeindex =  params->{node_index} ;
-        my $node = $schema->resultset('Node')->search({
-    			node_index => $nodeindex ,
-  		})->first;
-
-   		template 'nodeinfo.tt2',
-		{
-     		'node_servertypes'     =>  get_nodesrvtype( $node->server_type ), /* monitor subsrv type */
-			'node_index'          =>  $nodeindex,
-  		};	
-	}
-};
-
 true;
 
 
