@@ -62,7 +62,7 @@ any['get','post'] => '/node_getinfo' => sub {
 	}
 };
 get '/node_view/:nodeid' => sub {
-	if ( params->{nodeid} =~ m/[#&!\$\+_ ].*/g ) {
+	if ( params->{nodeid} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -71,11 +71,12 @@ get '/node_view/:nodeid' => sub {
     		my $node = $schema->resultset('Node')->search({
     			node_index => $nodeid ,
   		});
+			
 
-		dump ( $node );
    		template 'nodeinfo.tt2',
 		{
-     		    'node_info'           =>  $node ,
+     		    'node_info'           =>  $node->first ,
+		    'node_alias'          =>  $node->first,
   		};	
 	}
 };

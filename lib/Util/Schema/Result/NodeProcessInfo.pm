@@ -55,6 +55,12 @@ __PACKAGE__->table("NODE_PROCESS_INFO");
   original: {data_type => "number"}
   size: [3,0]
 
+=head2 inserted_times
+
+  data_type: 'varchar2'
+  is_nullable: 1
+  size: 14
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -78,11 +84,13 @@ __PACKAGE__->add_columns(
     original => { data_type => "number" },
     size => [3, 0],
   },
+  "inserted_times",
+  { data_type => "varchar2", is_nullable => 1, size => 14 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-02 17:47:10
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LMZJ2dK4bzV0gs1+ap+LqA
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-03 22:37:06
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:qEBX8mmj3nC7IVo6cjLogw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

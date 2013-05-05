@@ -4,13 +4,19 @@
              <ul class="nav nav-list">
                 <li class="nav-header">Sidebar</li>
                 <li class="active"><a href="#">主机信息一览</a></li>
+	          <ul>
+			  <li><a href="#">主机磁盘一览</a></li>
+			  <li><a href="#">主机内存一览</a></li>
+			  <li><a href="#">主机进程一览</a></li>
+			  <li><a href="#">主机备份一览</a></li>
+		  </ul>
                 <li><a href="#">主机监控配置</a></li>
               </ul>
             </div><!--/.well -->
           </div><!--/span-->
           <div class="span9">
-            <h4>主机IP [% node_info.monitor_ip %] </h4>
-            <h4>监控端口 [% node_info.monitor_port %] </h4>
+		 <p class="lead">主机IP:<span> [% node_info.monitor_ip %]</span> </p>
+		 <p class="lead">监控端口:<span> [% node_info.monitor_port %]</span></p>
             <hr class="bs-docs-separator">
             <h3>主机磁盘信息</h3>
             <hr class="bs-docs-separator">
