@@ -94,13 +94,13 @@ get '/node_cfgview/:node_index' => sub {
 	else {
 		my $schema = Util::Basic->schema;
 		my $nodeindex =  params->{node_index} ;
-        my $node = $schema->resultset('Node')->search({
+        	my $node = $schema->resultset('Node')->search({
     			node_index => $nodeindex ,
   		})->first;
 
    		template 'nodeinfo.tt2',
 		{
-     		'node_servertypes'     =>  get_nodesrvtype( $node->server_type ), /* monitor subsrv type */
+     			'node_servertypes'     =>  get_svrtype( $node->server_type ), /* monitor subsrv type */
 			'node_index'          =>  $nodeindex,
   		};	
 	}

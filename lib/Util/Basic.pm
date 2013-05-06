@@ -21,7 +21,7 @@ sub _build_pconfig {
 	my $config = File::Spec->catdir( $self->proot , 'conf' , 'monitor.yml' );
 	confess "conf/monitor.yml not exist!"
 		if( ! -e $config );
-    LoadFile( $config ); 
+    	LoadFile( $config ); 
 }
 
 #db path

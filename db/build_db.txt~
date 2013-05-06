@@ -6,7 +6,7 @@ create table nodes(
 	alias           VARCHAR2(20),
 	inserted_times  VARCHAR2(14),
 	running_status  NUMBER(2),    /* 开启  停止 */
-	server_type     NUMBER(2)     /* 进程监控 内存和磁盘监控 备份监控 数据库监控 业务监控*/
+	server_type     NUMBER(2)     /* 进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控*/
 	
 );
 
@@ -14,7 +14,7 @@ create table nodes(
 create table node_scheduling(	
 	node_index      VARCHAR2(32),
 	monitor_ip      VARCHAR2(15)，
-	server_type     NUMBER(2)     /* 进程监控 内存和磁盘监控 备份监控 数据库监控 业务监控*/
+	server_type     NUMBER(2)     /* 进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控*/
 	interval_time   NUMBER(8)     /*  秒为单位 监控更新间隔*/
 );
 
@@ -77,13 +77,23 @@ create table node_backup_info (
 	inserted_times    VARCHAR2(14)    /* 更新时间 */
 )
 /* 事件 */
-create table node_alarm_event (
+create table node_event (
 	node_index	  VARCHAR2(32),   /* 监控节点唯一索引 */
-	event_type        VARCHAR2(5),    /* 事件类型暂定三类 进程监控 内存和磁盘监控 备份监控 数据库监控 业务监控*/
+	event_type        VARCHAR2(5),    /* 事件类型暂定三类 进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控*/
 	event_time        VARCHAR2(14),   /* 事件发生时间 */
 	event_priority    VARCHAR2(4), 	  /* 事件优先级 普通 紧急 */
 	event_desc        VARCHAR2(512)   /* 事件描述 */
 )
+
+/* 监控类型 */
+		---------------------------------------------------
+		进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控
+		---------------------------------------------------
+索引		1        2      3        4        5           6  
+类型值		1        2      4        8        16          32  
+		---------------------------------------------------
+
+
 /*create db script*/
 
 create temporary tablespace sysmonitor_temp
