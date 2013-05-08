@@ -33,7 +33,7 @@ __PACKAGE__->table("NODE_PROCESS_INFO");
 
   data_type: 'varchar2'
   is_nullable: 1
-  size: 20
+  size: 60
 
 =head2 process_status
 
@@ -67,7 +67,7 @@ __PACKAGE__->add_columns(
   "node_index",
   { data_type => "varchar2", is_nullable => 1, size => 32 },
   "process_no",
-  { data_type => "varchar2", is_nullable => 1, size => 20 },
+  { data_type => "varchar2", is_nullable => 1, size => 60 },
   "process_status",
   { data_type => "varchar2", is_nullable => 1, size => 5 },
   "process_runnum",
@@ -89,8 +89,8 @@ __PACKAGE__->add_columns(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-03 22:37:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:qEBX8mmj3nC7IVo6cjLogw
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-07 10:05:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:OoRjSb/edBPUQJaoo1b8Nw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

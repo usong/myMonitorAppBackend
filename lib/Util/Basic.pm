@@ -5,7 +5,6 @@ use namespace::autoclean;
 use File::Spec ;
 use Cwd qw( abs_path );
 use 5.010;
-use Data::Dump qw( dump );
 #whole appliation root path
 has 'proot' => ( is => 'ro', isa => 'Str', lazy_build => 1 );
 sub _build_proot {
@@ -34,13 +33,13 @@ sub _build_pdb {
     return $config; 
 }
 
-#use Util::Schema;
-#has 'schema' => ( is => 'ro' , lazy_build => 1 );
-#sub _build_schema {
-#	my $self = shift;	
-#    my $schema = Util::Schema->connect( "dbi:Oracle:host=10.0.1.91;sid=devdb", "sysmonitor", "sysmonitor", '' , '' );
-#	return $schema;
-#}
+use Util::Schema;
+has 'schema' => ( is => 'ro' , lazy_build => 1 );
+sub _build_schema {
+	my $self = shift;	
+    my $schema = Util::Schema->connect( "dbi:Oracle:host=10.0.1.91;sid=devdb", "sysmonitor", "sysmonitor", '' , '' );
+	return $schema;
+}
 
 1;
 

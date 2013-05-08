@@ -2,14 +2,14 @@
           <div class="span3">
            <div class="well sidebar-nav">
              <ul class="nav nav-list">
-                <li class="nav-header">Sidebar</li>
+                <li class="nav-header">功能项</li>
                 <li class="active"><a href="[% node_view %]/[% node_index %]">主机信息一览</a></li>
-                <li><a href="[% node_cfgview %]/[% node_index %]"">主机监控配置项</a>
+                <li><a href="[% node_cfgview %]/[% node_index %]">主机监控配置项</a>
 					<ul>
 			  			<li><a href="[% hd_paramcfg_url %]/[% node_index %]">磁盘监控参数配置</a></li>
 			  			<li><a href="[% mm_paramcfg_url %]/[% node_index %]">内存监控参数配置</a></li>
-			  			<li><a href="[% process_paramcfg_url %]/[% node_index %]">进程监控参数配置<a>/l>
-		  				<li><a href="[% backup_paramcfg_url %]/[% node_index %]">备份参数配置</li>
+						<li><a href="[% process_paramcfg_url %]/[% node_index %]">进程监控参数配置<a></li>
+		  				<li><a href="[% backup_paramcfg_url %]/[% node_index %]">备份参数配置</a></li>	
 		  			</ul>
 				</li>
               </ul>
