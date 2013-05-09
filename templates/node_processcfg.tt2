@@ -20,49 +20,32 @@
 		 <p class="lead">监控端口:<span> [% node.monitor_port %]</span></p>
 		 
             <hr class="bs-docs-separator">
-            <h3>主机磁盘信息</h3>
+            <h3>主机进程信息</h3>
             <hr class="bs-docs-separator">
-	    <form action="[% param_hdconfig_url %]" method="post" >
+	    <form action="[% param_processconfig_url %]" method="post" >
             <table class="table table-striped table-hover table-condensed">
               <thead>
                 <tr>
-                  <th>分区挂接点</th>
-                  <th>分区大小</th>
-                  <th>已使用大小</th>
-                  <th>未使用大小</th>
-                  <th>已使用百分比</th>
-		  <th>已使用报警阀值</th>
+                  <th>进程名</th>
+                  <th>设定运行个数</th>
                 </tr>
               </thead>
               <tbody>
-		[% FOREACH hd IN node_hds %]
+		[% FOREACH item IN node_process %]
                 <tr>
-                  <td value="[% hd.hd_no %]">[% hd.hd_no %]</td>
-                  <td>[% hd.hd_no_size %]</td>
-                  <td>[% hd.hd_used_size %]</td>
-                  <td>[% hd.hd_unused_size %]</td>
-		  <td>[% hd.hd_usepercent %]</td>
+                  <td>[%  item.process_no %]</td>
 		  <td>
-	          <select name="threhold_items">
-		  <!--<option class="span1" value="[% hd.hd_threhold %]">[% hd.hd_threhold %]%</option>-->
-		  [% FOREACH op IN ['0' '70' '75' '80' '85' '90' ] %]
-		      [% IF op ==  hd.hd_threhold %]
-		           [% IF op == '0' %]
-			   <option class="span1" selected="true"  value="[% op %]">不启用</option>
-		           [% ELSE %]
-			   <option class="span1" selected="true"  value="[% op %]">[% op %]%</option>
-			   [% END %]
+	          <select name="process_setnums">
+		  [% FOREACH op IN [ 1 .. 50 ] %]
+		      [% IF op ==  item.process_setnum %]
+			   <option class="span1" selected="true"  value="[% op %]">[% op %]</option>
 		      [% ELSE %]
-		      	   [% IF op == '0' %]
-			   <option class="span1"  value="[% op %]">不启用</option>
-		           [% ELSE %]
-			   <option class="span1"  value="[% op %]">[% op %]%</option>
-			   [% END %]
+			   <option class="span1"  value="[% op %]">[% op %]</option>
 		      [% END %]
 		  [% END %]
 	          </select>
 	          </td>
-		  <td><input type="hidden"  name="hd_no_items" value="[% hd.hd_no %]"></input></td>
+		  <td><input type="hidden"  name="process_items" value="[% item.process_no %]"></input></td>
                 </tr>
 		[% END %]
               </tbody>
@@ -71,7 +54,7 @@
 	   <button type="submit" class="btn pull-center">保存</button>
 	   </form> 
 	   <div class="alert alert-error"><h5>提示:</h5>
-		   <h6>当主机磁盘挂接点使用容量大于'报警阀值'时,主机报警事件将被触发.</h6></div>
+		   <h6>当主机进程'实际运行个数'小于'设定运行个数'时,主机报警事件将被触发.</h6></div>
           </div>
         </div><!-- row-fluid -->
       

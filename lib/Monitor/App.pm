@@ -23,7 +23,8 @@ hook before_template_render => sub {
     $tokens->{mm_paramcfg_url}   =  uri_for('/mm_paramcfg');#  /* mm_param */
     $tokens->{process_paramcfg_url}   =  uri_for('/process_paramcfg');  #/* process_param */
     $tokens->{backup_paramcfg_url}   =  uri_for('/backup_paramcfg');  #/* backup_param */
-    $tokens->{param_hdconfig_url}   =  uri_for('/param_hdconfigok');#  /* param config ok */
+    $tokens->{param_hdconfig_url}   =  uri_for('/param_hdconfigok');#  /* hd_param config ok */
+    $tokens->{param_processconfig_url}   =  uri_for('/param_processconfigok');#  /* process_param config ok */
 };
 
 any '/' => sub {
@@ -100,7 +101,66 @@ get '/node_cfgview/:node_index' => sub {
   		};	
 	}
 };
+#process running nums setting
+get '/process_paramcfg/:node_index' => sub {
+	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex =  params->{node_index} ;
+		my $node = $schema->resultset('Node')->search({
+    			node_index => $nodeindex ,
+  		})->first;
+	        #process config information
+        	my @node_processset = $schema->resultset('NodeProcessInfo')->search({
+    			node_index => $nodeindex ,
+  		})->all;
+	        if(  scalar( @node_processset )  ){
+			template 'node_processcfg.tt2',
+			{
+			 	'node_process'            =>  \@node_processset,
+			 	'node'                    =>  $node ,
+			};	 
+		} else {
+		        #initial config 
+		        forward "404.html" ;
+	        }
+	}
+};
 
+#process_config ok
+post '/param_processconfigok' => sub {
+	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex = params->{ node_index } ;
+		my $buf = undef;
+		my @process_items =  params->{ process_items } ;
+		my @process_setnums =  params->{ process_setnums } ;
+		my $result = 0;	
+		#merge hd_no => threhold 
+		dump(@process_items);
+		dump(@process_setnums );	
+		dump( "12123213213123123123123123123123123"  );
+		dump($nodeindex );
+		my %process_hash = Util::Tools->Array_Merge( @process_items , @process_setnums );
+		dump( %process_hash  );
+		dump( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  );
+		my $resultset = $schema->resultset('NodeProcessInfo') ;
+		if( $resultset->update_process_setnums( $schema ,$nodeindex, \%process_hash ) ) { $result = 1 ; }
+
+		template 'node_processcfgok.tt2',
+		{
+		    	'db_result'    =>  $result ,
+		};	 
+	}
+
+};
+
+#hard_drive threhold setting
 get '/hd_paramcfg/:node_index' => sub {
 	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
 		forward "404.html" ;
@@ -115,26 +175,20 @@ get '/hd_paramcfg/:node_index' => sub {
         	my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search({
     			node_index => $nodeindex ,
   		});
-	        if(  scalar(@node_hdinfoset) > 0 ){
+	        if(  scalar(@node_hdinfoset)  ){
 		    template 'node_hdcfg.tt2',
 		    {
-		    	'node_hds'            =>  \@node_hdinfoset,# /* monitor subsrv type */
+		    	'node_hds'            =>  \@node_hdinfoset,
 		    	'node'                =>  $node ,
-			#'test'                =>  $hash ,
 		    };	 
 		 } else {
-		    #send msg to svr
-		    #template 'node_hdcfg.tt2',
-		    #{
-		    #	'node_hds'            =>  $node_hdinfoset, #/* monitor subsrv type */
-		    #	'node_index'          =>  $nodeindex,
-  		    #};
+		    # #initial config 
 		    forward "404.html" ;
 	         }
 	}
 };
 
-#config ok
+#hd_config ok
 post '/param_hdconfigok' => sub {
 	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
 		forward "404.html" ;
@@ -151,17 +205,11 @@ post '/param_hdconfigok' => sub {
 		#merge hd_no => threhold 
 		dump(@hd_no_items);
 		dump(@threhold_items );	
-		my %hd_hash = Util::Tools->HdInfo_Merge( @hd_no_items , @threhold_items );
-		dump( $hd_hash{'a'} );	
-		if( $schema->resultset('NodeHdInfo')->insert_or_update( $nodeindex, \%hd_hash ) ) { $result = 1 ; }
-		
-		#merge array 	
-		#map { $buf .= $_.' ' } params->{hd_no_items};
-		#map { $buf .= $_.' ' } params->{threhold_item};
-		#my $node = $schema->resultset('Node')->search({
-    		#	node_index => $nodeindex ,
-		#});
-		dump( $result );
+		my %hd_hash = Util::Tools->Array_Merge( @hd_no_items , @threhold_items );
+
+		my $resultset = $schema->resultset('NodeHdInfo') ;
+		if( $resultset->update_hd_threhold( $schema ,$nodeindex, \%hd_hash ) ) { $result = 1 ; }
+
 		template 'node_hdcfgok.tt2',
 		{
 		    	'db_result'    =>  $result ,

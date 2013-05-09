@@ -11,7 +11,7 @@ use namespace::autoclean;
 
 }
 =cut
-sub HdInfo_Merge (\@\@) {
+sub Array_Merge (\@\@) {
     my $self = shift;
     my @tmp = @_; #first array item length
     return undef 

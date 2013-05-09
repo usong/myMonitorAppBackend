@@ -81,7 +81,6 @@ create table node_mm_collect (
 create table node_process_info (
 	node_index	  VARCHAR2(32), /* 监控节点唯一索引 */
 	process_no        VARCHAR2(60), /* 进程名称 */
-	process_desc      VARCHAR2(60), /* 进程描述 */
 	process_status    VARCHAR2(5),  /* 进程状态 */
 	process_runnum    NUMBER(3),     /* 运行个数 */
 	process_setnum    NUMBER(3)     /* 设置个数 */
@@ -92,6 +91,7 @@ create table node_process_info (
 create table node_process_collect (
 	node_index	  VARCHAR2(32), /* 监控节点唯一索引 */
 	process_no        VARCHAR2(60), /* 进程 */
+	process_desc      VARCHAR2(60), /* 进程描述 */
 	process_status    VARCHAR2(5),  /* 进程状态 */
 	process_runnum    NUMBER(3),     /* 运行个数 */
 	process_setnum    NUMBER(3)     /* 设置个数 */
