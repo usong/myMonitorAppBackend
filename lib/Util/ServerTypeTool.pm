@@ -1,35 +1,27 @@
+use utf8; 
 package Util::ServerTypeTool;
 use Moose;
+with 'Util::Role::ServerType';
 
-with 'Util::ServerType';
-
-sub msg_process_decode {
-
+sub get_svrtype_hash {
+	my ( $self , $svrtypevalue ) = @_;
+	my $pos = 1;
+	my $value = 0;
+	my %hash = %{ $self->types };
+	do {
+            if( $svrtypevalue & 0x01) {
+	        if( exists $hash{ $pos } ) {
+	       	    $hash{ $pos }{ 'has_types' } = 1;
+	        } else { print 'overflow defined process !'; exit(0) }
+	        $value = $value + 2**($pos-1);
+	    }
+	} while (  ( $svrtypevalue = $svrtypevalue >> 1 ) && ( $pos++ ) );
+	return $self->types;
 }
 
-sub msg_process_encode {
-
-
+sub get_hassvrtype_nums {
+	my $self = shift;
+	my @type = grep { $self->types->{ $_ }->{ 'has_types' } eq 1  } 1..6 ;
+	return scalar  @type;
 }
-
-sub msg_mm_decode {
-
-}
-
-sub msg_mm_encode {
-
-
-}
-sub msg_hd_decode {
-
-}
-sub msg_hd_encode {
-}
-sub msg_backup_decode {
-}
-sub msg_backup_encode {
-}
-sub msg_db_decode {
-}
-sub msg_db_encode {
-}
+1;

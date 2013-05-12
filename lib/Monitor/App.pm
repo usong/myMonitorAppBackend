@@ -6,6 +6,7 @@ use Util::Tools;
 use File::Spec ;
 use Data::Dump qw(dump);
 use Encode;
+use Util::ServerTypeTool;
 use utf8;
 our $VERSION = '0.1';
 
@@ -90,14 +91,21 @@ get '/node_cfgview/:node_index' => sub {
 	else {
 		my $schema = Util::Basic->schema;
 		my $nodeindex =  params->{node_index} ;
-        	my $node = $schema->resultset('Node')->search({
-    			node_index => $nodeindex ,
-  		})->first;
+		
+		my $resultset = $schema->resultset('Node');
+		my $servertype = $resultset->get_nodeservertype( $nodeindex );
+  		
+		my $obj = Util::ServerTypeTool->new;	
+		my $servertypehash = $obj->get_svrtype_hash( $servertype );
 
-   		template 'nodeinfo.tt2',
+		my $typenums =  $obj->get_hassvrtype_nums ;
+		my $tmp = $servertypehash;
+   		template 'node_svrtypecfg.tt2',
 		{
-			#'node_servertypes'     =>  get_svrtype( $node->server_type ), /* monitor subsrv type */
+			'node_servertypes'    =>  $servertypehash,# /* monitor subsrv type */
 			'node_index'          =>  $nodeindex,
+			'type_nums'           =>  $typenums,
+			
   		};	
 	}
 };
@@ -142,13 +150,7 @@ post '/param_processconfigok' => sub {
 		my @process_setnums =  params->{ process_setnums } ;
 		my $result = 0;	
 		#merge hd_no => threhold 
-		dump(@process_items);
-		dump(@process_setnums );	
-		dump( "12123213213123123123123123123123123"  );
-		dump($nodeindex );
 		my %process_hash = Util::Tools->Array_Merge( @process_items , @process_setnums );
-		dump( %process_hash  );
-		dump( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  );
 		my $resultset = $schema->resultset('NodeProcessInfo') ;
 		if( $resultset->update_process_setnums( $schema ,$nodeindex, \%process_hash ) ) { $result = 1 ; }
 

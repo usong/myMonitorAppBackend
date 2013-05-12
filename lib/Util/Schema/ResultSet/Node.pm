@@ -1,10 +1,20 @@
 use utf8;
-package Util::Schema::ResultSet::NodeHdInfo;
+package Util::Schema::ResultSet::Node;
 
 use Moose; 
 extends qw/DBIx::Class::ResultSet DBIx::Class::Schema  DBIx::Class::Storage/;
 
-sub update_hd_threhold {
+
+sub get_nodeservertype {
+	my ( $self  ,$nodeindex ) = @_;
+
+	my $node = $self->search({
+		node_index => $nodeindex ,
+	})->first;
+	return $node->server_type;
+
+}
+sub update_servertype {
 	my ( $self , $schema ,$nodeindex, $nodehds ) = @_;
 	#update or insert node_hd_info
 	
@@ -27,7 +37,7 @@ sub update_hd_threhold {
         return 0;
 }
 
-sub insert_hd_info {
+sub insert_servertype {
 	my ( $self , $schema ,$nodeindex, $nodehds ) = @_;
 	#insert node_hd_info
 	eval {	
@@ -52,3 +62,4 @@ sub insert_hd_info {
         $schema->txn_commit();
         return 0;
 }
+

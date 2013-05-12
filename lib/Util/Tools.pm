@@ -1,14 +1,10 @@
 package Util::Tools;
 
-use MooseX::Singleton;
-use namespace::autoclean;
+use Moose;
 =pod
 {
    { hd_no => '' } 
    { 
-	
-
-
 }
 =cut
 sub Array_Merge (\@\@) {
