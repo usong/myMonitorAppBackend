@@ -10,6 +10,9 @@
     <link href="[% public_resource %]/monitorapp.css" rel="stylesheet">
     <link href="[% public_resource %]/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="[% public_resource %]/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <script src="[% public_resource %]/bootstrap/js/bootstrap-modal.js"></script>
+    <script src="[% public_resource %]/bootstrap/js/bootstrap.js"></script>
+    <script src="[% public_resource %]/bootstrap/js/jquery.js"></script>
   </head>
   <body>
   <!-- head div -->

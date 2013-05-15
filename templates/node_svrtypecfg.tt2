@@ -21,7 +21,7 @@
             <hr class="bs-docs-separator">
             <h3>主机监控子服务配置</h3>
             <hr class="bs-docs-separator">
-	    <form action="[% param_processconfig_url %]" method="post" >
+	    <form action="[% node_cfgokview %]" method="post" >
 	    <table class="table table-striped table-hover table-condensed">
               <thead>
                 <tr>
@@ -34,7 +34,7 @@
                 <tr>
                   <td value="[% item.type %]">[% item.desc %]</td>
                   <td>
-	          <select name="selected_item">
+	          <select name="selected_items">
 		      [% FOREACH op IN ['0' '1'] %]
 		      	  [% IF op ==  item.has_types %]
 		              [% IF op == '0' %]
@@ -44,24 +44,24 @@
 			      [% END %]
 		      	  [% ELSE %]
 		      	      [% IF op == '0' %]
-			    	  <option class="span1"  value="[% op %]">不启用</option>
+			    	  <option class="span1"  value="[% op %]">关闭</option>
 		              [% ELSE %]
 			   	  <option class="span1"  value="[% op %]">启用</option>
 			      [% END %]
 		          [% END %]
 		      [%  END %]
 	          </select>
-	          </td>
+  		  </td><input type="hidden" name="types" value="[% item.type %]"></input></td>
+		  <td>
                 </tr>
 		[% END %]
               </tbody>
       	   </table>	
 	   <input type="hidden" name="node_index" value="[% node.node_index %]"></input> 
-	   <input type="file"   name="filename"> 
 	   <button type="submit" class="btn pull-center">保存</button>
 	   </form> 
 	   <div class="alert alert-error"><h5>提示:</h5>
-		   <h6>当主机进程'实际运行个数'小于'设定运行个数'时,主机报警事件将被触发.</h6></div>
+		   <h6>当监控子进程处于关闭状态，报警事件将进行采集和通知.</h6></div>
           </div>
         </div><!-- row-fluid -->
       

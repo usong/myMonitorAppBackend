@@ -4,10 +4,14 @@ use Monitor::App;
 use Util::Basic;
 use 5.010;
 use Data::Dump qw( dump );
-#use Util::ServerTypeTool;
-#my $obj = Util::ServerTypeTool->new;
-#$obj->get_svrtype_hash( 7 ) ;
-#my @type = grep { $obj->types->{ $_ }->{ 'has_types' } eq 1  } 1..6 ;
-#map { say $_." " } @type;
 
+#use 5.010;
+#use Data::Dump qw( dump );
+#use Util::Test;
+#use Util::MessageDispatch;
+#my $obj = new Util::Test;
+#$obj->do;
+#txntype
+#my $dp = new Util::MessageDispatch;
+#$dp->disptach( undef, 1001, $data );
 dance;

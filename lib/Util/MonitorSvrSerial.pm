@@ -2,16 +2,16 @@ package Util::MonitorSvrSerial;
 
 use Moose;
 
-with 'Util::Message';
-
+with  "Util::Message";
 sub check_msgvalid {
     my ( $self, $data ) = shift;
     confess 'msghead  invaild ,checking the datagram '  
-    	unless ( exists $data->{ 'TxnType' } &&  
-		 exists $data->{ 'Version' } &&
+    	unless ( exists $data->{ 'Version' } &&
+		 exists $data->{ 'TxnType' } &&  
 		 exists $data->{ 'Record_amount' } &&
 		 exists $data->{ 'Response_code' } &&
-		 exists $data->{ 'Record_length' } 
+		 exists $data->{ 'Record_length' } && 
+		 exists $data->{ 'Response_msg'  } && 
 	       )
 
      confess 'msgbody  invaild ,checking the datagram '  
@@ -29,12 +29,18 @@ sub 1001_pack {
     $self->check_msgvalid( $data );	
 
     my $buf = undef;
-    $buf = pack('A4 A2 A4 A6 A4 A32 A16 A6 A14 A2 A2' , values %$data );
-    $sele->MsgHead( unpack( 'A20' , $buf   );
-    $sele->MsgBody( unpack( 'x20 A*' , $buf );
+    #            --------44-------- =====================
+    $buf = pack('A2 A4 A4 A6 A4 A24 A32 A16 A6 A14 A2 A2' , values %$data );
+    $self->MsgHead( unpack( 'A44' , $buf   );
+    $self->MsgBody( unpack( 'x44 A*' , $buf );
+   
 }
 sub 1001_unpack {
     my $self = shift;
+    #            --------44-------- =====================
+    $buf = pack('A2 A4 A4 A6 A4 A24 A32 A16 A6 A14 A2 A2' , values %$data );
+    $self->MsgHead( unpack( 'A44' , $buf   );
+    $self->MsgBody( unpack( 'x44 A*' , $buf );
 }
 
 1;

@@ -2,7 +2,6 @@ use utf8;
 package Util::Role::ServerType;
 use Moose::Role;
 use Encode;
-use 5.010;
 use constant PROCSS_TYPE  => 1;
 use constant MM_TYPE      => 2;
 use constant HD_TYPE      => 3;

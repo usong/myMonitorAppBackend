@@ -7,6 +7,7 @@ use File::Spec ;
 use Data::Dump qw(dump);
 use Encode;
 use Util::ServerTypeTool;
+use Util::MessageDispatch;
 use utf8;
 our $VERSION = '0.1';
 
@@ -19,7 +20,8 @@ hook before_template_render => sub {
     my $tokens = shift;
     $tokens->{public_resource}   =  request->uri_base ;# /* uri_base */
     $tokens->{node_view}   =  uri_for('/node_view');  #/* node_information */
-    $tokens->{node_cfgview}   =  uri_for('/node_cfgview'); # /* node_confg view */
+    $tokens->{node_cfgview}   =  uri_for('/node_svrcfgview'); # /* node_confg view */
+    $tokens->{node_cfgokview}   =  uri_for('/node_svrcfgokview'); # /* node_confg view */
     $tokens->{hd_paramcfg_url}   =  uri_for('/hd_paramcfg');#  /* hd_param */
     $tokens->{mm_paramcfg_url}   =  uri_for('/mm_paramcfg');#  /* mm_param */
     $tokens->{process_paramcfg_url}   =  uri_for('/process_paramcfg');  #/* process_param */
@@ -41,12 +43,43 @@ any '/' => sub {
   	};
 };
 
+
+any '/test' => sub {
+    	my $dp = new Util::MessageDispatch;
+
+	
+	
+	$dp->setting(  '127.0.0.1',8888 );
+	
+	my $data = 
+		{
+			'node_index' 	 => '1',
+			'server_ip'  	 => '1',
+			'port'           => '1',
+			'inserted_time'    => 0,
+			'running_status' => 0,
+			'server_type'    => 64,
+			'txntype'        => 1001,
+			'hostname'       => 'ttttt',
+
+		};
+
+	my $buf = $dp->disptach( undef, 1001, $data );
+	#$dp->disptach( undef, 1001 , $data );
+	
+	unless( $buf ) {
+		return 'fuckshit';
+	}
+	return  $buf;
+};
+
 #any['get','post'] => '/get_value' => sub {
 options '/node_getinfo' => sub {
 		header('Access-Control-Allow-Origin' => '*,');
 		header('Access-Control-Allow-Methods'=>'POST, GET, OPTIONS');
 		header('Access-Control-Allow-Headers'=>'origin, X-Requested-With, content-type, accept');
 };
+
 any['get','post'] => '/node_getinfo' => sub {
 	
 	if ( request->request_method =~ /^options$/i ) {
@@ -62,6 +95,34 @@ any['get','post'] => '/node_getinfo' => sub {
 		header('Access-Control-Allow-Methods'=>'POST, GET, OPTIONS');
 		header('Access-Control-Allow-Headers'=>'origin, X-Requested-With, content-type, accept');
 		return $hash->{'ip'};
+		#generate node_index
+		#search have exist the node_index
+		# timestamp as nodeindex
+		my $nodeidx = time();
+		#my $dp = new Util::MessageDispatch;
+		##send 1001 create a new host monitor server
+		#my $data = 
+		#{
+		#	'node_index' 	 => $nodeidx, 'server_ip'      => $serverip,  'port'           => $port,
+		#	'inserted_time'  => 0,        'running_status' => 0,          'server_type'    => 64,
+		#	'txntype'        => 1001,     'hostname'       => 'ttttt',
+		#};
+		#$dp->setting(  Util::Basic->pconfig->{'server_ip'} , Util::Basic->pconfig->{'port'} );
+		#unless( $dp->disptach( undef, 1001 , $data ) ) {
+
+		#	return 'error msg to client';
+		#}
+		#my $data = 
+		#{
+		#	'node_index' 	 => $nodeidx,
+		#	'server_ip'  	 => $serverip,
+		#	'port'           => $port,
+		#	'insert_time'    => undef,
+		#	'running_status' => undef,
+		#	'server_type'    => undef,
+		#}
+		#my $dp = new Util::MessageDispatch;
+		#$dp->disptach( undef, 1001 , $data );
 	}
 };
 get '/node_view/:node_index' => sub {
@@ -84,7 +145,7 @@ get '/node_view/:node_index' => sub {
 	}
 };
 
-get '/node_cfgview/:node_index' => sub {
+get '/node_svrcfgview/:node_index' => sub {
 	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
 		forward "404.html" ;
 	}
@@ -93,6 +154,9 @@ get '/node_cfgview/:node_index' => sub {
 		my $nodeindex =  params->{node_index} ;
 		
 		my $resultset = $schema->resultset('Node');
+		my $node = $resultset->search({
+    			node_index => $nodeindex ,
+  		})->first;
 		my $servertype = $resultset->get_nodeservertype( $nodeindex );
   		
 		my $obj = Util::ServerTypeTool->new;	
@@ -105,10 +169,43 @@ get '/node_cfgview/:node_index' => sub {
 			'node_servertypes'    =>  $servertypehash,# /* monitor subsrv type */
 			'node_index'          =>  $nodeindex,
 			'type_nums'           =>  $typenums,
+			'node'                =>  $node ,
 			
   		};	
 	}
 };
+
+post '/node_svrcfgokview' => sub {
+	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex = params->{ node_index } ;
+		my @types =  params->{ types } ;
+		my @selected_items =  params->{ selected_items } ;
+	        my %selected_tp_hash = Util::Tools->Array_Merge( @types , @selected_items );
+		my $value = Util::Tools->GetBitValue( %selected_tp_hash );
+		dump( $nodeindex  );
+		dump( @types  );
+		dump( @selected_items  );
+		dump( %selected_tp_hash );
+		dump( $value );
+		my $result = 0;	
+	
+		my $resultset = $schema->resultset('Node') ;
+		if( $resultset->update_nodeservertype( $schema ,'1' , $value ) ) { $result = 1 ; }
+
+		template 'node_svrtypecfgok.tt2',
+		{
+		    	'db_result'    =>  $result ,
+		};	 
+	}
+
+};
+
+
+
 #process running nums setting
 get '/process_paramcfg/:node_index' => sub {
 	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {

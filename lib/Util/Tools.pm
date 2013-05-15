@@ -19,6 +19,18 @@ sub Array_Merge (\@\@) {
   	map  { $_->[$ix] } @tmp;
     } 0..$#{ $tmp[0] }; 
 }
+
+sub GetBitValue (\@) {
+    my $self  = shift;
+    my %hash  = @_; 
+    my $value = 0;
+    foreach  my $item ( keys %hash ) {
+	 if( $hash{ $item } ) {
+	     $value += 	2**($item-1);
+	 }	 
+    }
+    return $value;
+}
 1;
 
 

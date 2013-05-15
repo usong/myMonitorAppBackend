@@ -14,19 +14,14 @@ sub get_nodeservertype {
 	return $node->server_type;
 
 }
-sub update_servertype {
-	my ( $self , $schema ,$nodeindex, $nodehds ) = @_;
-	#update or insert node_hd_info
-	
+sub update_nodeservertype {
+	my ( $self , $schema ,$nodeindex, $svrtypevalue ) = @_;
 	eval {	
 		$schema->txn_begin();
-		for my $hd ( keys %{ $nodehds } ) {
-			my $hdinfosets = $self->search({
-				node_index => $nodeindex ,
-				hd_no      => $hd        ,
-			});
-			$hdinfosets->update( { 'hd_threhold' => $nodehds->{ $hd }  } );
-        	}
+		my $typeset = $self->search({
+			node_index => $nodeindex ,
+		});
+		$typeset->update( { 'server_type' => $svrtypevalue  } );
 	};
 	if( $@ ) { 
 		print "Failed Manutiplate Database UpData or Insert,\n" ;

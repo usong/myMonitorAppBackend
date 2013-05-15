@@ -12,13 +12,42 @@
             	 <img src='[% public_resource %]/img/add.png' style='width: 180px; height: 180px'>
 		 <a href="[% public_resource %]/node_view/[% node.node_index %]"><div class='caption'><p class="text-info">[% node.alias %]</p></div></a>
 	      </div>
-	      </li>
+	  </li>
 	[% END %]
+	    <li class='span3'>
+	      <div class='thumbnail'>
+                  <div class='imgclass'>
+			  <div class='mycircle_out_class'>
+		          <img  src='[% public_resource %]/img/del.png' style='display:none ;width: 18px; height: 18px'></img>
+			  </div>
+	         </div>
+            	 <img src='[% public_resource %]/img/add.png' style='width: 180px; height: 180px'>
+		 <!--a href="[% public_resource %]/#"  style='width: 180px' data-toggle="modal" data-target="#myModal"><div class='caption'><p class="text-info">新增节点</p></div></a>	-->
+		 <a href="#myModal" role="button" class="btn" data-toggle="modal"><div class='caption'><p class="text-info">新增节点</p></div></a>
+	      </div>
+	  </li>
 	</ul>
 </div> 
 
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Modal header</h3>
+  </div>
+  <div class="modal-body">
+    <p>One fine body…</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary">Save changes</button>
+  </div>
+</div>
+
+
+
+<!--
 <div id="x-modal-div" style="display : none">
-  <!-- Modal -->
+  
   <div is="x-modal" id="modal_example">
     <div class="modal-header ">
       <button type="button" class="close" data-dismiss="modal" id="modalheader_close" aria-hidden="true">×</button>
@@ -52,10 +81,12 @@
         </div>
        <div class="alert alert-info" id="alert_tip" style="display : none"></div>
        </form>
-    </div> <!-- modal body -->
+    </div>  modal body 
     <div class="modal-footer ">
       <button class="btn" data-dismiss="modal" id="modalfooter_close" aria-hidden="true">关闭</button>
       <button class="btn btn-primary" id="status_submit">获取信息</button>              
-    </div> <!-- modal footer -->
-  </div> <!-- x-modal footer -->
-</div> <!-- x-modal-div -->
+    </div>   modal footer 
+  </div>  x-modal footer 
+</div>  x-modal-div 
+-->
+
