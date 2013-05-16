@@ -1,15 +1,14 @@
-package Util::Role::MonitorSvrSerial;
+package Util::Role::MonitorSvrSerial::1001;
 
 use Moose::Role;
 use 5.010;
 with 'Util::Role::Message';
 use Data::Dump qw/dump/;
+use FindBin;
 
-sub BUILD {
-    my $self = shift;
-    $self->Head_Format('A2 A4 A4 A6 A4 A24');
-    $self->Body_Format('A32 A15 A6 A64 A14 A2 A2');
-}
+has 'Head_Format' => ( is =>'rw' , 'isa' => 'Str' , default => 'A2 A4 A4 A6 A4 A24' );
+has 'Body_Format' => ( is =>'rw' , 'isa' => 'Str' , default => 'A32 A15 A6 A64 A14 A2 A2' );
+
 #############################
 #send to server package begin 
 #############################
@@ -24,7 +23,6 @@ sub pre_headpack {
 	'record_length' => '0071',
  	'response_msg'  => '0',
     };
-    #dump($head_hash);
     $self->MsgHead(
 	    pack(   $self->Head_Format , 
 	    	    $head_hash->{'version'},
@@ -76,7 +74,7 @@ sub pre_headunpack {
       $head_hash->{'response_code'}, 
       $head_hash->{'record_length'}, 
       $head_hash->{'response_msg'}, 
-    ) = unpack(  $self->Head_Format , $data  );
+    ) = unpack(  $self->Head_Format  , $data  );
     return $head_hash;
 }
 
@@ -98,8 +96,9 @@ sub pre_bodyunpack {
 ############################################
 #callback funcition from outside moose class 
 ############################################
-sub encode_1001 {
+sub encode {
     my ( $self, $dthash ) = @_;
+   
     #            --------44-------- =====================
     #$buf = pack('A2 A4 A4 A6 A4 A24 A32 A16 A6 A14 A2 A2' , values %$data );
     if( $self->check_msgvalid( $dthash ) ) { return undef };
@@ -108,7 +107,7 @@ sub encode_1001 {
     return $self->datadump;
 }
 
-sub decode_1001 {
+sub decode {
     my $self = shift;
     #say 'I am decode_1001';
     #            --------44-------- =====================
@@ -125,8 +124,9 @@ sub decode_1001 {
 
 sub check_msgvalid {
     my ( $self ,$data ) = @_;
+   
     unless( exists $data->{ 'node_index' } &&  
-            exists $data->{ 'server_ip' } &&
+	    exists $data->{ 'server_ip' } &&
             exists $data->{ 'port' } &&
             exists $data->{ 'inserted_time' } &&
             exists $data->{ 'running_status' } &&

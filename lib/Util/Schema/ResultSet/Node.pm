@@ -4,6 +4,15 @@ package Util::Schema::ResultSet::Node;
 use Moose; 
 extends qw/DBIx::Class::ResultSet DBIx::Class::Schema  DBIx::Class::Storage/;
 
+sub get_noderow_throughip {
+	my ( $self  ,$ip ) = @_;
+
+	my $node = $self->search({
+		monitor_ip => $ip ,
+	});
+	return $node->count;
+
+}
 
 sub get_nodeservertype {
 	my ( $self  ,$nodeindex ) = @_;

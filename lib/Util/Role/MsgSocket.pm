@@ -5,6 +5,7 @@ use Moose::Role;
 #use AnyEvent::Socket;
 #use AnyEvent::Handle;
 use LWP::Socket;
+#use Data::Dump qw/dump/;
 use 5.010;
 has 'condition' => ( is => 'rw' , isa => 'AnyEvent::CondVar'  );
 has 'sock'      => ( is => 'rw'  );
@@ -24,16 +25,20 @@ sub comm {
 	my $data ;
 	eval {
 		my $socket = new LWP::Socket;
-		$socket->connect( '127.0.0.1', 8888 ); # echo
-		$socket->write( $sendbuf );
+		$socket->connect( $self->server_ip, $self->port ); # echo
+		$socket->write( $sendbuf."\015\012" );
 		$socket->read( \$buf , 5 ,15 );
-		$socket->read( \$data , int( $buf ) ,15 );
+		$socket->read( \$data ,  $buf ,15 );
+		
+	#$socket->read( \$data ,  $buf - 5 ,15 );
 		$self->package( $data );
+		
 		$socket = undef;  # close
 	};
 	if( $@ ) { 
 	    return undef;
 	}
+	return 1;
 }
 #sub comm {
 #	my $self      = shift;

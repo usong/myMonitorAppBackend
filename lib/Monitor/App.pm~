@@ -64,9 +64,9 @@ any '/test' => sub {
 		};
 
 	my $buf = $dp->disptach( undef, 1001, $data );
-	#unless( $buf ) {
-	#forward "404.html" ;
-		#}
+	unless( $buf ) {
+		forward "404.html" ;
+	}
 	return  $buf;
 };
 
