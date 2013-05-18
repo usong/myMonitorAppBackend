@@ -21,12 +21,12 @@ create table node_scheduling(
 create table node_system_info (
 	node_index	  VARCHAR2(32),            /* 监控节点唯一索引 */
 	cpu_num           NUMBER(6),               /* cpu 个数 */
-	cpu_process_info  VARCHAR2(32),            /* cpu 处理器型号信息 */
+	cpu_process_info  VARCHAR2(64),            /* cpu 处理器型号信息 */
         opsys_info        VARCHAR2(32),            /*  主机操作系统信息 */
-	mm_size		  VARCHAR2(12),    	   /*  主机内存 */
-	mm_free_size      VARCHAR2(12),            /* 可用内存 */
-	hd_size           VARCHAR2(12),            /* 磁盘总空间  */
-	hd_free_size      VARCHAR2(12)            /* 磁盘剩余空间 */
+	mm_size		  VARCHAR2(12),    	   /*  主机内存 M*/
+	mm_free_size      VARCHAR2(12),            /* 可用内存 M*/
+	hd_size           VARCHAR2(12),            /* 磁盘总空间  KB*/
+	hd_free_size      VARCHAR2(12)            /* 磁盘剩余空间 KB*/
 );
 /* 磁盘信息 */
 create table node_hd_info (
@@ -34,19 +34,20 @@ create table node_hd_info (
 	hd_no             VARCHAR2(32),     /* 挂接点名称 */
 	hd_no_size        VARCHAR2(12),     /* 挂接点大小 */
 	hd_used_size      VARCHAR2(12),     /* 挂接点已使用大小 */
-	hd_unused_size    VARCHAR2(12),     /* 挂接点未使用大小 */
 	hd_free_size      VARCHAR2(12),     /* 挂接点剩余大小 */
 	hd_threhold       VARCHAR2(6)       /* 报警阀值百分比 */
 	hd_usepercent     VARCHAR2(6)       /* 已使用百分比 */ 
 	inserted_times    VARCHAR2(14),
 );
 /* 磁盘数据采集 */
+
+
+
 create table node_hd_collect (
 	node_index	  VARCHAR2(32),     /* 监控节点唯一索引 */
 	hd_no             VARCHAR2(32),     /* 挂接点名称 */
 	hd_no_size        VARCHAR2(12),     /* 挂接点大小 */
 	hd_used_size      VARCHAR2(12),     /* 挂接点已使用大小 */
-	hd_unused_size    VARCHAR2(12),     /* 挂接点未使用大小 */
 	hd_free_size      VARCHAR2(12),     /* 挂接点剩余大小 */
 	hd_threhold       VARCHAR2(6)       /* 报警阀值百分比 */
 	hd_usepercent     VARCHAR2(6)       /* 已使用百分比 */ 
@@ -59,23 +60,28 @@ create table node_mm_info (
 	node_index	  VARCHAR2(32),     /* 监控节点唯一索引 */	
 	mm_size           VARCHAR2(12),     /* 内存总大小 */	
 	mm_used		  VARCHAR2(12),     /* 内存已使用大小 */
-	hd_unused         VARCHAR2(6)       /* 内存未使用大小 */
-	mm_threhold       VARCHAR2(6),       /* 报警阀值百分比 */
-	hd_usepercent     VARCHAR2(6)       /* 已使用百分比 */
+	mm_free           VARCHAR2(6),       /* 内存未使用大小 */
+	swap_size         VARCHAR2(12),      /* swap 大小 */
+	swap_used         VARCHAR2(12),      /* swap 已用大小 */
+	swap_free         VARCHAR2(12),      /* swap 未用大小 */
 	inserted_times    VARCHAR2(14),
 
 );
 /* 内存信息采集 */
+
 create table node_mm_collect (
 	node_index	  VARCHAR2(32),     /* 监控节点唯一索引 */	
 	mm_size           VARCHAR2(12),     /* 内存总大小 */	
 	mm_used		  VARCHAR2(12),     /* 内存已使用大小 */
-	hd_unused         VARCHAR2(6)       /* 内存未使用大小 */
-	mm_threhold       VARCHAR2(6),       /* 报警阀值百分比 */
-	hd_usepercent     VARCHAR2(6)       /* 已使用百分比 */
-	inserted_times    VARCHAR2(14),
+	mm_free           VARCHAR2(6),       /* 内存未使用大小 */
+	swap_size         VARCHAR2(12),      /* swap 大小 */
+	swap_used         VARCHAR2(12),      /* swap 已用大小 */
+	swap_free         VARCHAR2(12),      /* swap 未用大小 */
+	inserted_times    VARCHAR2(14)
 
 );
+
+
 
 /* 进程信息 */
 create table node_process_info (

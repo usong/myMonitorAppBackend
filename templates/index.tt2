@@ -25,7 +25,7 @@
             <li>
           </li>-->
           </ul>
-          <h3 class="muted">Monitor App</h3>
+	  <h3 class="muted"><a href="[% request.uri_base  %]">Monitor App</a></h3>
         </div>
 		[% content %]
     </div>    

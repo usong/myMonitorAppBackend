@@ -46,21 +46,22 @@ sub disptach {
         return undef;		
     }
     my $pluginname = $self->pluginroom->plugins->{ $txnType };
-    dump(  $pluginname );
     apply_all_roles( $self, $pluginname );
-    #my $buf = $self->txntypes->{ $txnType }->[0]->execute( $self, $data );
     my $buf = $self->encode( $data );
-    $self->package( $buf );
-    #say '>>>>>>',$self->package;
+    
+    #say '####', $txnType,'###',$data;
     #say '>>>>>>', length( $self->package );
-    return undef unless( $self->comm( $buf ) ) ;
-
-    # say '>>>>>>',$self->package;
-    #say '>>>>>>', length( $self->package );
-    return  $self->package;
-    #return $self->decode();
+    #return undef unless( $self->comm( $buf ) ) ;
+    unless( $self->comm( $buf ) ) {
+	say '>>>>>> ',  'No recive a package';	
+	return undef;
+    } 
+    #say '>>>>>>',  $self->package;
+    return  $self->decode;
+    
+    #return  $self->package;
+    #my $buf = $self->txntypes->{ $txnType }->[0]->execute( $self, $data );
     #return $self->txntypes->{ $txnType }->[1]->( $self );
-    #return '11';
 }
 
 sub setting {

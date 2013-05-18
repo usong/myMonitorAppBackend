@@ -47,12 +47,6 @@ __PACKAGE__->table("NODE_HD_COLLECT");
   is_nullable: 1
   size: 12
 
-=head2 hd_unused_size
-
-  data_type: 'varchar2'
-  is_nullable: 1
-  size: 12
-
 =head2 hd_free_size
 
   data_type: 'varchar2'
@@ -88,8 +82,6 @@ __PACKAGE__->add_columns(
   { data_type => "varchar2", is_nullable => 1, size => 12 },
   "hd_used_size",
   { data_type => "varchar2", is_nullable => 1, size => 12 },
-  "hd_unused_size",
-  { data_type => "varchar2", is_nullable => 1, size => 12 },
   "hd_free_size",
   { data_type => "varchar2", is_nullable => 1, size => 12 },
   "hd_threhold",
@@ -101,8 +93,8 @@ __PACKAGE__->add_columns(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-09 18:46:01
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xmTI2/Fp7v9q1jPVCur4OQ
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-18 16:26:27
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8ScpNqKo/Y0mcrzijQjdxQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -28,7 +28,7 @@ sub _build_plugins {
     my $config = Util::Basic->pconfig;
     my $pkgpath = $config->{ 'PluginPath' }->{ 'path' };
     find( sub {
-		if( $_  =~ /(\d+)/g ) {
+		if( $_  =~ /(\d+).pm/g ) {
 		      my $txntype = $1;
 		      $pkgpath =~ s/\//::/g;
 		      $hash->{ $txntype } = $pkgpath.'::'.$txntype;

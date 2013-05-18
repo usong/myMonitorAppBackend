@@ -19,6 +19,7 @@ set serializer => 'JSON';
 hook before_template_render => sub {
     my $tokens = shift;
     $tokens->{public_resource}   =  request->uri_base ;# /* uri_base */
+    $tokens->{webroot}   =  uri_for('/');  #/* node_information */
     $tokens->{node_view}   =  uri_for('/node_view');  #/* node_information */
     $tokens->{node_cfgview}   =  uri_for('/node_svrcfgview'); # /* node_confg view */
     $tokens->{node_cfgokview}   =  uri_for('/node_svrcfgokview'); # /* node_confg view */
@@ -47,27 +48,87 @@ any '/' => sub {
 
 any '/test' => sub {
 
+
+=pod
 	my $config = Util::Basic->pconfig->{ 'MonitroServer' };
 	my $dp = new Util::MessageDispatch;
 	$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
-	my $data = 
-		{
-			'node_index' 	 => '1',
-			'server_ip'  	 => '1',
-			'port'           => '1',
-			'inserted_time'    => 0,
-			'running_status' => 0,
-			'server_type'    => 64,
-			'txntype'        => 1001,
-			'hostname'       => 'ttttt',
 
-		};
+	my $data_1001 = 
+	{
+		'node_index' 	 => 123456,
+		'server_ip'  	 => '10.0.1.171' ,
+		'port'           => 9000,
+		'inserted_time'  => 0,
+		'running_status' => 0,
+		'server_type'    => 0,
+		'txntype'        => 1001,
+		'hostname'       => '555',
+	
+	};
+	my $result_1001 = $dp->disptach( undef, 1001, $data_1001 ); #1001  create a monitor server host
 
-	my $buf = $dp->disptach( undef, 1001, $data );
-	#unless( $buf ) {
-	#forward "404.html" ;
-		#}
-	return  $buf;
+	unless( $result_1001 ) {
+		dump( $result_1001);
+		dump( 'failed!' );
+		return ( '999999' , 'comminication failed' );
+	}
+
+	if( $result_1001->{ 'response_code' } ne '000000' ) {
+		return ( $result_1001->{ 'response_code' } , $result_1001->{ 'response_msg' } );
+	} 
+
+
+	my $data_1005 = 
+	{
+		'node_index' 	 => 123456,
+		'cpunum'  	 => 0 ,
+		'cputype'        => 0,
+		'opsys_info'     => 0,
+		'mmsize'         => 0,
+		'mmfreesize'     => 0,
+		'hdsize'         => 0,
+		'hdfreesize'     => 0,
+		'txntype'        => 1005,
+	
+	};
+	my $result_1005 = $dp->disptach( undef, 1005, $data_1005 ); #1005  create a monitor server host
+
+	unless( $result_1005 ) {
+		dump( 'failed!' );
+		return ( '999999' , 'comminication failed' );
+	}
+	
+	if( $result_1005->{ 'response_code' } ne '000000' ) {
+		return ( $result_1005->{ 'response_code' } , $result_1005->{ 'response_msg' } );
+	} else {
+		#dump( $result_1005 );
+		#return ( '000000' ,'here....3');
+
+	}
+=cut
+	#my $config = Util::Basic->pconfig->{ 'MonitroServer' };
+	##my $dp = new Util::MessageDispatch;
+	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
+	#my $data = 
+	#	{
+	#		'node_index' 	 => '1',
+	#		'server_ip'  	 => '1',
+	#		'port'           => '1',
+	#		'inserted_time'    => 0,
+	#		'running_status' => 0,
+	#		'server_type'    => 64,
+	#		'txntype'        => 1001,
+	#		'hostname'       => 'ttttt',
+
+	#	};
+
+	#my $buf = $dp->disptach( undef, 1001, $data );
+	#dump( $buf );
+	#my $tmp = $dp->disptach( undef, 1005, $data );
+	#dump( $tmp );
+	#
+	#return  $buf;
 };
 
 get '/node_add' => sub {
@@ -97,9 +158,15 @@ post '/node_addprocess' => sub {
 			$tip    = "提示:\n该节点已被添加,请输入新节点信息!",
 		} else {
 		    	# comm to server and get server information from monitor server
-
 			my $obj = new Util::TxnFlow ;
-			my $rlt = $obj->add_node_and_initialinfo( params->{nodeip} , params->{nodeport} , params->{nodealias} );
+			my $nodeidx = time();
+			my ( $rlt , $msg ) = $obj->add_node_and_initialinfo( $nodeidx ,params->{nodeip} , params->{nodeport} , params->{nodealias} , $schema );
+			if( $rlt ne '000000' ) {
+				return ($rlt ,$msg ); #forward error pages 
+			
+			}
+			redirect '/node_view/1368867046';
+		
 		
 		}
 	}
@@ -111,48 +178,13 @@ post '/node_addprocess' => sub {
 		};
 
 	}
-
-	#return 1;
-	#if( ( params->{nodeip} eq "" ) || ( params->{nodealias} eq "" ) ||
-	#    ( params->{nodealias} eq "" ) )
-	#{	
-	#	dump( params->{ nodeip } );
-	#	dump( params->{ nodealias } );
-	#	#template 'nodes.tt2',
-	#	#{
-	#	#		'check_value'         =>  1 ,
-	#	#		'check_tip'           =>  'xxx',
-	#	#};
-	#	return '12312123';
-
-	#}
-	    
-	#return params->{ nodeip } ;
-	
+	template 'node_info.tt2',
+	{
+			'node_info'           =>  [ 'monitor_ip' , '127.0.0.1' , 'monitor_port' , '80' ],
+			'node_index'          =>  121212,
+	};
 };
-#add node process
-#options '/node_addprocess' => sub {
-#		header('Access-Control-Allow-Origin' => '*,');
-#		header('Access-Control-Allow-Methods'=>'POST, GET, OPTIONS');
-#		header('Access-Control-Allow-Headers'=>'origin, X-Requested-With, content-type, accept');
-#};
-#any['get','post'] => '/node_addprocess' => sub {
-#
-#    	if ( request->request_method =~ /^options$/i ) {
-#	        header('Access-Control-Allow-Origin' => '*,');
-#		headers('Access-Control-Allow-Methods'=>'POST, GET, OPTIONS');
-#		headers('Access-Control-Allow-Headers'=>'origin, X-Requested-With, content-type, accept');
-#	} else {
-#		my $json = JSON->new->utf8;
-#	        my $json_text1 = param "XForms:Model";
-#                $json_text1 = Encode::encode('UTF-8', $json_text1);
-#		my $hash = $json->decode( $json_text1 ); 
-#		header('Access-Control-Allow-Origin' => '*,');
-#		header('Access-Control-Allow-Methods'=>'POST, GET, OPTIONS');
-#		header('Access-Control-Allow-Headers'=>'origin, X-Requested-With, content-type, accept');
-#		return $hash->{'ip'};
-#	}
-#};
+
 
 
 
@@ -217,11 +249,14 @@ get '/node_view/:node_index' => sub {
     		my $node = $schema->resultset('Node')->search({
     			node_index => $nodeindex ,
   		});
-			
+		my $hostinfo = $schema->resultset('NodeSystemInfo')->search({
+    			node_index => $nodeindex ,
+  		});
 
-   		template 'nodeinfo.tt2',
+   		template 'node_info.tt2',
 		{
-     		'node_info'           =>  $node->first ,
+     			'node_info'           =>  $node->first ,
+     			'host_info'           =>  $hostinfo->first ,
 			'node_index'          =>  $nodeindex,
   		};	
 	}

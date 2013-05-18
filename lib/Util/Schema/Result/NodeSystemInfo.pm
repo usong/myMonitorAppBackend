@@ -40,7 +40,7 @@ __PACKAGE__->table("NODE_SYSTEM_INFO");
 
   data_type: 'varchar2'
   is_nullable: 1
-  size: 32
+  size: 64
 
 =head2 opsys_info
 
@@ -85,7 +85,7 @@ __PACKAGE__->add_columns(
     size => [6, 0],
   },
   "cpu_process_info",
-  { data_type => "varchar2", is_nullable => 1, size => 32 },
+  { data_type => "varchar2", is_nullable => 1, size => 64 },
   "opsys_info",
   { data_type => "varchar2", is_nullable => 1, size => 32 },
   "mm_size",

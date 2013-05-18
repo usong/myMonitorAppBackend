@@ -41,23 +41,29 @@ __PACKAGE__->table("NODE_MM_COLLECT");
   is_nullable: 1
   size: 12
 
-=head2 hd_unused
+=head2 mm_free
 
   data_type: 'varchar2'
   is_nullable: 1
   size: 6
 
-=head2 mm_threhold
+=head2 swap_size
 
   data_type: 'varchar2'
   is_nullable: 1
-  size: 6
+  size: 12
 
-=head2 hd_usepercent
+=head2 swap_used
 
   data_type: 'varchar2'
   is_nullable: 1
-  size: 6
+  size: 12
+
+=head2 swap_free
+
+  data_type: 'varchar2'
+  is_nullable: 1
+  size: 12
 
 =head2 inserted_times
 
@@ -74,19 +80,21 @@ __PACKAGE__->add_columns(
   { data_type => "varchar2", is_nullable => 1, size => 12 },
   "mm_used",
   { data_type => "varchar2", is_nullable => 1, size => 12 },
-  "hd_unused",
+  "mm_free",
   { data_type => "varchar2", is_nullable => 1, size => 6 },
-  "mm_threhold",
-  { data_type => "varchar2", is_nullable => 1, size => 6 },
-  "hd_usepercent",
-  { data_type => "varchar2", is_nullable => 1, size => 6 },
+  "swap_size",
+  { data_type => "varchar2", is_nullable => 1, size => 12 },
+  "swap_used",
+  { data_type => "varchar2", is_nullable => 1, size => 12 },
+  "swap_free",
+  { data_type => "varchar2", is_nullable => 1, size => 12 },
   "inserted_times",
   { data_type => "varchar2", is_nullable => 1, size => 14 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-09 18:46:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eIg1Abf6HZwUyIuf4CvZTw
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-18 16:26:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vRkE6wE/Esp54+QqY8eMCg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

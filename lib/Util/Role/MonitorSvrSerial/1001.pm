@@ -6,8 +6,14 @@ with 'Util::Role::Message';
 use Data::Dump qw/dump/;
 use FindBin;
 
-has 'Head_Format' => ( is =>'rw' , 'isa' => 'Str' , default => 'A2 A4 A4 A6 A4 A24' );
-has 'Body_Format' => ( is =>'rw' , 'isa' => 'Str' , default => 'A32 A15 A6 A64 A14 A2 A2' );
+sub get_Head_Format { 
+	my $self = shift; 
+	return "A2 A4 A4 A6 A4 A24"; 
+}
+sub get_Body_Format { 
+	my $self = shift; 
+	return "A32 A15 A6 A64 A14 A2 A2" 
+}
 
 #############################
 #send to server package begin 
@@ -24,7 +30,7 @@ sub pre_headpack {
  	'response_msg'  => '0',
     };
     $self->MsgHead(
-	    pack(   $self->Head_Format , 
+	    pack(   $self->get_Head_Format , 
 	    	    $head_hash->{'version'},
 		    $head_hash->{'txnType'}, 
 		    $head_hash->{'record_amount'}, 
@@ -48,13 +54,13 @@ sub pre_bodypack {
 	'running_status'      => $data->{ 'running_status' },
 	'server_type'         => $data->{ 'server_type' },
     };
-  
+    say '1001', $self->get_Body_Format; 
     $self->MsgBody(
-	    pack(   $self->Body_Format , 
+	    pack(   $self->get_Body_Format , 
 	    	    $body_hash->{'node_index'},
 		    $body_hash->{'server_ip'}, 
 		    $body_hash->{'port'}, 
-		    $body_hash->{ 'hostname' },
+		    $body_hash->{'hostname' },
 		    $body_hash->{'inserted_time'}, 
 		    $body_hash->{'running_status'}, 
 		    $body_hash->{'server_type'}, 
@@ -74,7 +80,7 @@ sub pre_headunpack {
       $head_hash->{'response_code'}, 
       $head_hash->{'record_length'}, 
       $head_hash->{'response_msg'}, 
-    ) = unpack(  $self->Head_Format  , $data  );
+    ) = unpack(  $self->get_Head_Format  , $data  );
     return $head_hash;
 }
 
@@ -88,9 +94,8 @@ sub pre_bodyunpack {
       $body_hash->{'inserted_time'}, 
       $body_hash->{'running_status'}, 
       $body_hash->{'server_type'}, 
-    ) = unpack( 'x44 '.$self->Body_Format , $data );
+    ) = unpack( 'x44 '.$self->get_Body_Format , $data );
     return $body_hash;
-
 }
 
 ############################################
@@ -98,7 +103,7 @@ sub pre_bodyunpack {
 ############################################
 sub encode {
     my ( $self, $dthash ) = @_;
-   
+    dump( $dthash );
     #            --------44-------- =====================
     #$buf = pack('A2 A4 A4 A6 A4 A24 A32 A16 A6 A14 A2 A2' , values %$data );
     if( $self->check_msgvalid( $dthash ) ) { return undef };
@@ -109,17 +114,14 @@ sub encode {
 
 sub decode {
     my $self = shift;
-    #say 'I am decode_1001';
-    #            --------44-------- =====================
-    #$buf = pack('A2 A4 A4 A6 A4 A24 A32 A16 A6 A14 A2 A2' , values %$data );
-    #
+    say 'I am decode_1001';
     if( length( $self->package ) != 179 ) { return undef; }
     my $hdhash   = $self->pre_bodyunpack( $self->package );
     my $bodyhash = $self->pre_headunpack( $self->package );
-    #dump( $hdhash );
-    #dump( $bodyhash );
-    #$hdhash->{ keys %$bodyhash } = values %$bodyhash;
-    return   ( %$hdhash, %$bodyhash ) ;
+    dump( $hdhash );
+    #my %hash = ( %$hdhash, %$bodyhash ) ;
+    foreach my $item ( keys %$bodyhash ) {  $hdhash->{ $item } = $bodyhash->{ $item } };
+    return  $hdhash ;
 }
 
 sub check_msgvalid {
@@ -140,6 +142,9 @@ sub check_msgvalid {
     }
     return 0;
 }
-
+sub test {
+    my $self = shift;
+    dump('i am 1001');
+}
 
 1;

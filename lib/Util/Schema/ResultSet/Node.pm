@@ -41,6 +41,32 @@ sub update_nodeservertype {
         return 0;
 }
 
+sub insert_noderow {
+	my ( $self , $row , $schema ) = @_;
+	#insert node_hd_info
+	eval {	
+		$schema->txn_begin();
+	
+		$self->create({
+		     'node_index' 	 => $row->{'node_index'},
+		     'monitor_ip'  	 => $row->{'server_ip'} ,
+		     'monitor_port'      => $row->{'port'},
+		     'alias'             => $row->{'hostname'},
+		     'inserted_times'    => $row->{'inserted_time'},
+		     'running_status'    => $row->{'running_status'},
+		     'server_type'       => $row->{'server_type'}
+		});
+            
+	};
+	if( $@ ) { 
+		print "Failed Manutiplate Database UpData or Insert,\n" ;
+		$schema->txn_rollback();
+		return 1;
+	} 
+        $schema->txn_commit();
+        return 0;
+}
+
 sub insert_servertype {
 	my ( $self , $schema ,$nodeindex, $nodehds ) = @_;
 	#insert node_hd_info

@@ -5,15 +5,14 @@ use Moose::Role;
 #use AnyEvent::Socket;
 #use AnyEvent::Handle;
 use LWP::Socket;
-#use Data::Dump qw/dump/;
+use Data::Dump qw/dump/;
 use 5.010;
-has 'condition' => ( is => 'rw' , isa => 'AnyEvent::CondVar'  );
+#has 'condition' => ( is => 'rw' , isa => 'AnyEvent::CondVar'  );
 has 'sock'      => ( is => 'rw'  );
 has 'handle'    => ( is => 'rw'  ); 
 has 'package'   => ( is => 'rw' , isa => 'Str'  );
 has 'server_ip' => ( is => 'rw'  );
 has 'port' 	=> ( is => 'rw' );
-
 has HeadSize => ( is => 'rw' ,default =>  5 );
 
 sub comm {
@@ -26,14 +25,21 @@ sub comm {
 	eval {
 		my $socket = new LWP::Socket;
 		$socket->connect( $self->server_ip, $self->port ); # echo
-		$socket->write( $sendbuf."\015\012" );
-		$socket->read( \$buf , 5 ,15 );
-		$socket->read( \$data ,  $buf ,15 );
-		
-	#$socket->read( \$data ,  $buf - 5 ,15 );
-		$self->package( $data );
-		
-		$socket = undef;  # close
+		$socket->write( $sendbuf );
+		$socket->read( \$buf , 5 , 15 );
+		dump( $buf );
+		if( $buf =~ /^\d+$/ ) {
+			$socket->read( \$data , int( $buf ) - 5 , 15 );
+			dump( $data );
+	       	 	$self->package( $data );
+			$socket = undef;  # close
+		} else {
+			dump( 'package is invalid.please checking the package from remote host' );
+			$socket = undef;  # close
+			return undef;
+		}
+
+	        
 	};
 	if( $@ ) { 
 	    return undef;
