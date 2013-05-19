@@ -48,65 +48,85 @@ any '/' => sub {
 
 any '/test' => sub {
 
+	my $schema = Util::Basic->schema;
+	#Util::Schema::Result::Node->has_many( ccc => 'Util::Schema::Result::NodeSystemInfo', 'node_index');
 
+	#Util::Schema::Result::Node->has_many('NodeSystemInfo', 'Util::Schema::Result::NodeSystemInfo');
+	#Util::Schema::Result::NodeSystemInfo->belongs_to('Node', 'Util::Schema::Result::Node', 'node_index');
+	my $node_rs = $schema->resultset('Node')->search( {
+		order_by => 'inserted_times DESC',
+		rows => 8,
+		page => 1 } , { prefetch    => ['NodeSystemInfo']} );
+	my @array = $node_rs->node_index;
+	dump(@array);
+	dump( $node_rs->nodes );
+#foreach  my $item  ( $node_rs->all ) {
+#
+#		dump( $item->node_index );
+#
+#	}
+	
+
+	#my $config = Util::Basic->pconfig->{ 'MonitroServer' };
+	#my $dp = new Util::MessageDispatch;
+	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
+       
+	#my $data_1030 = 
+	#{
+	#	'node_index' 	 => '1368970126',
+	#	'hd_name'  	 => '0' ,
+	#	'hd_size'        => '0',
+	#	'hd_used'  	 => 0,
+	#	'hd_free'        => 0,
+	#	'hd_threhold'    => 0,
+	#	'hd_usepercent'  => 0,
+	#	'insert_time'    => 0,
+	#	'txntype'        => 1030,
+
+	#};
+	#my $result_1030 = $dp->disptach( undef, 1030, $data_1030 ); #1003  create a monitor server host
+	#
+	#unless( $result_1030 ) {
+	#	dump( $result_1030);
+	#	dump( 'failed!' );
+	#	return ( '999999' , 'comminication failed' );
+	#}
+	#if( $result_1030->{ 'response_code' } ne '000000' ) {
+	#	return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	#}
+	#return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	#$dp = undef;
+	#$dp = new Util::MessageDispatch;
+	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
+	#my $data_1005 = 
+	#{
+	#	'node_index' 	 =>  $nodeidx,
+	#	'cpunum'  	 => 0 ,
+	#	'cputype'        => 0,
+	#	'opsys_info'     => 0,
+	#	'mmsize'         => 0,
+	#	'mmfreesize'     => 0,
+	#	'hdsize'         => 0,
+	#	'hdfreesize'     => 0,
+	#	'txntype'        => 1005,
+	#
+	#};
+	#my $result_1005 = $dp->disptach( undef, 1005, $data_1005 ); #1005  create a monitor server host
+
+	#unless( $result_1005 ) {
+	#	dump( 'failed!' );
+	#	return ( '999999' , 'comminication failed' );
+	#}
+	#
+	#if( $result_1005->{ 'response_code' } ne '000000' ) {
+	#	return ( $result_1005->{ 'response_code' } , $result_1005->{ 'response_msg' } );
+	#} else {
+	#	#dump( $result_1005 );
+	#	#return ( '000000' ,'here....3');
+	#	return ( $result_1005->{ 'response_code' } , $result_1005->{ 'response_msg' } );
+
+	#}
 =pod
-	my $config = Util::Basic->pconfig->{ 'MonitroServer' };
-	my $dp = new Util::MessageDispatch;
-	$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
-
-	my $data_1001 = 
-	{
-		'node_index' 	 => 123456,
-		'server_ip'  	 => '10.0.1.171' ,
-		'port'           => 9000,
-		'inserted_time'  => 0,
-		'running_status' => 0,
-		'server_type'    => 0,
-		'txntype'        => 1001,
-		'hostname'       => '555',
-	
-	};
-	my $result_1001 = $dp->disptach( undef, 1001, $data_1001 ); #1001  create a monitor server host
-
-	unless( $result_1001 ) {
-		dump( $result_1001);
-		dump( 'failed!' );
-		return ( '999999' , 'comminication failed' );
-	}
-
-	if( $result_1001->{ 'response_code' } ne '000000' ) {
-		return ( $result_1001->{ 'response_code' } , $result_1001->{ 'response_msg' } );
-	} 
-
-
-	my $data_1005 = 
-	{
-		'node_index' 	 => 123456,
-		'cpunum'  	 => 0 ,
-		'cputype'        => 0,
-		'opsys_info'     => 0,
-		'mmsize'         => 0,
-		'mmfreesize'     => 0,
-		'hdsize'         => 0,
-		'hdfreesize'     => 0,
-		'txntype'        => 1005,
-	
-	};
-	my $result_1005 = $dp->disptach( undef, 1005, $data_1005 ); #1005  create a monitor server host
-
-	unless( $result_1005 ) {
-		dump( 'failed!' );
-		return ( '999999' , 'comminication failed' );
-	}
-	
-	if( $result_1005->{ 'response_code' } ne '000000' ) {
-		return ( $result_1005->{ 'response_code' } , $result_1005->{ 'response_msg' } );
-	} else {
-		#dump( $result_1005 );
-		#return ( '000000' ,'here....3');
-
-	}
-=cut
 	#my $config = Util::Basic->pconfig->{ 'MonitroServer' };
 	##my $dp = new Util::MessageDispatch;
 	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
@@ -129,6 +149,8 @@ any '/test' => sub {
 	#dump( $tmp );
 	#
 	#return  $buf;
+=cut
+
 };
 
 get '/node_add' => sub {
@@ -162,12 +184,13 @@ post '/node_addprocess' => sub {
 			my $nodeidx = time();
 			my ( $rlt , $msg ) = $obj->add_node_and_initialinfo( $nodeidx ,params->{nodeip} , params->{nodeport} , params->{nodealias} , $schema );
 			if( $rlt ne '000000' ) {
-				return ($rlt ,$msg ); #forward error pages 
-			
+				#return ($rlt ,$msg ); #forward error pages 
+				redirect '500.html';
+			} else {
+				my $path = '/node_view/'.$nodeidx;
+				dump( $path );
+				redirect "/node_view/$nodeidx";
 			}
-			redirect '/node_view/1368867046';
-		
-		
 		}
 	}
 	if( $failed ) {
@@ -178,11 +201,11 @@ post '/node_addprocess' => sub {
 		};
 
 	}
-	template 'node_info.tt2',
-	{
-			'node_info'           =>  [ 'monitor_ip' , '127.0.0.1' , 'monitor_port' , '80' ],
-			'node_index'          =>  121212,
-	};
+	#template 'node_info.tt2',
+	#{
+	#		'node_info'           =>  [ 'monitor_ip' , '127.0.0.1' , 'monitor_port' , '80' ],
+	#		'node_index'          =>  121212,
+	#};
 };
 
 
@@ -209,34 +232,6 @@ any['get','post'] => '/node_getinfo' => sub {
 		header('Access-Control-Allow-Methods'=>'POST, GET, OPTIONS');
 		header('Access-Control-Allow-Headers'=>'origin, X-Requested-With, content-type, accept');
 		return $hash->{'ip'};
-		#generate node_index
-		#search have exist the node_index
-		# timestamp as nodeindex
-		my $nodeidx = time();
-		#my $dp = new Util::MessageDispatch;
-		##send 1001 create a new host monitor server
-		#my $data = 
-		#{
-		#	'node_index' 	 => $nodeidx, 'server_ip'      => $serverip,  'port'           => $port,
-		#	'inserted_time'  => 0,        'running_status' => 0,          'server_type'    => 64,
-		#	'txntype'        => 1001,     'hostname'       => 'ttttt',
-		#};
-		#$dp->setting(  Util::Basic->pconfig->{'server_ip'} , Util::Basic->pconfig->{'port'} );
-		#unless( $dp->disptach( undef, 1001 , $data ) ) {
-
-		#	return 'error msg to client';
-		#}
-		#my $data = 
-		#{
-		#	'node_index' 	 => $nodeidx,
-		#	'server_ip'  	 => $serverip,
-		#	'port'           => $port,
-		#	'insert_time'    => undef,
-		#	'running_status' => undef,
-		#	'server_type'    => undef,
-		#}
-		#my $dp = new Util::MessageDispatch;
-		#$dp->disptach( undef, 1001 , $data );
 	}
 };
 get '/node_view/:node_index' => sub {
@@ -297,31 +292,33 @@ post '/node_svrcfgokview' => sub {
 		forward "404.html" ;
 	}
 	else {
-		my $schema = Util::Basic->schema;
 		my $nodeindex = params->{ node_index } ;
 		my @types =  params->{ types } ;
 		my @selected_items =  params->{ selected_items } ;
 	        my %selected_tp_hash = Util::Tools->Array_Merge( @types , @selected_items );
 		my $value = Util::Tools->GetBitValue( %selected_tp_hash );
-		dump( $nodeindex  );
-		dump( @types  );
-		dump( @selected_items  );
-		dump( %selected_tp_hash );
-		dump( $value );
+		#dump( $nodeindex );
+		#dump( @types );
+		#dump( @selected_items );
+		#dump( %selected_tp_hash );
+		#dump( $value );
 		my $result = 0;	
-	
-		my $resultset = $schema->resultset('Node') ;
-		if( $resultset->update_nodeservertype( $schema ,'1' , $value ) ) { $result = 1 ; }
-
-		template 'node_svrtypecfgok.tt2',
-		{
+		#send 1003 message package
+		my $obj = new Util::TxnFlow ;
+		my ( $rlt , $msg ) = $obj->add_nodesvrtype( $nodeindex , $value );
+		if( $rlt ne '000000' ) {
+			redirect '500.html';
+		} else {
+		#end 
+			template 'node_svrtypecfgok.tt2',
+			{
 		    	'db_result'    =>  $result ,
-		};	 
+			'node_index'   =>  $nodeindex,
+			};
+		}		
 	}
 
 };
-
-
 
 #process running nums setting
 get '/process_paramcfg/:node_index' => sub {
@@ -371,6 +368,7 @@ post '/param_processconfigok' => sub {
 		template 'node_processcfgok.tt2',
 		{
 		    	'db_result'    =>  $result ,
+			'node_index'   =>  $nodeindex,
 		};	 
 	}
 
@@ -429,6 +427,7 @@ post '/param_hdconfigok' => sub {
 		template 'node_hdcfgok.tt2',
 		{
 		    	'db_result'    =>  $result ,
+			'node_index'   =>  $nodeindex,
 		};	 
 	}
 

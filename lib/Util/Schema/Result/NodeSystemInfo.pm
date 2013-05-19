@@ -26,7 +26,7 @@ __PACKAGE__->table("NODE_SYSTEM_INFO");
 =head2 node_index
 
   data_type: 'varchar2'
-  is_nullable: 1
+  is_nullable: 0
   size: 32
 
 =head2 cpu_num
@@ -76,7 +76,7 @@ __PACKAGE__->table("NODE_SYSTEM_INFO");
 
 __PACKAGE__->add_columns(
   "node_index",
-  { data_type => "varchar2", is_nullable => 1, size => 32 },
+  { data_type => "varchar2", is_nullable => 0, size => 32 },
   "cpu_num",
   {
     data_type => "numeric",
@@ -98,9 +98,21 @@ __PACKAGE__->add_columns(
   { data_type => "varchar2", is_nullable => 1, size => 12 },
 );
 
+=head1 PRIMARY KEY
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-02 17:47:10
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:IbLCPs0PoXt8kHBcIPPKYw
+=over 4
+
+=item * L</node_index>
+
+=back
+
+=cut
+
+__PACKAGE__->set_primary_key("node_index");
+#__PACKAGE__->belongs_to( 'node_index' => 'Util::Schema::Result::Node');
+
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-19 19:46:54
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GrKtV9pm0Ra0OKk8plkwmQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -1,18 +1,17 @@
-package Util::Role::MonitorSvrSerial::1001;
+package Util::Role::MonitorSvrSerial::1030;
 
 use Moose::Role;
 use 5.010;
 with 'Util::Role::Message';
 use Data::Dump qw/dump/;
-use FindBin;
 
 sub get_Head_Format { 
 	my $self = shift; 
-	return "A2 A4 A4 A6 A4 A24"; 
+	return "A2 A4 A4 A6 A4 A24";
 }
 sub get_Body_Format { 
 	my $self = shift; 
-	return "A32 A15 A6 A64 A14 A2 A2" 
+	return "A32 A32 A12 A12 A12 A6 A6 A14";
 }
 
 #############################
@@ -26,9 +25,10 @@ sub pre_headpack {
 	'txnType' => $data->{ 'txntype' },
 	'record_amount' => '0001',
 	'response_code' => '000000',
-	'record_length' => '0071',
+	'record_length' => '0182',
  	'response_msg'  => '0',
     };
+    dump($head_hash);
     $self->MsgHead(
 	    pack(   $self->get_Head_Format , 
 	    	    $head_hash->{'version'},
@@ -45,25 +45,27 @@ sub pre_bodypack {
     my ( $self, $data ) = @_;
     #check data value
     my $body_hash = {
-	#'node_index'          => '0' x ( 32 - length ( $data->{ 'node_index' } ) ) . $data->{ 'node_index' } ,
 	'node_index'          => $data->{ 'node_index' },
-	'server_ip'           => $data->{ 'server_ip' },
-	'port'                => '0' x ( 6 - length ( $data->{ 'port' } ) ) . $data->{ 'port' },
-	'hostname'            => $data->{ 'hostname' },
-	'inserted_time'       => $data->{ 'inserted_time' },
-	'running_status'      => $data->{ 'running_status' },
-	'server_type'         => $data->{ 'server_type' },
+	'hd_name'             => $data->{ 'hd_name' },
+	'hd_size'             => $data->{ 'hd_size' },
+	'hd_used'             => $data->{ 'hd_used' },
+	'hd_free'             => $data->{ 'hd_free' },
+	'hd_threhold'         => $data->{ 'hd_threhold' },
+	'hd_usepercent'       => $data->{ 'hd_usepercent' },
+	'insert_time'         => $data->{ 'insert_time' },
     };
-    say '1001', $self->get_Body_Format; 
+    say '1030', $self->get_Body_Format; 
+   
     $self->MsgBody(
 	    pack(   $self->get_Body_Format , 
 	    	    $body_hash->{'node_index'},
-		    $body_hash->{'server_ip'}, 
-		    $body_hash->{'port'}, 
-		    $body_hash->{'hostname' },
-		    $body_hash->{'inserted_time'}, 
-		    $body_hash->{'running_status'}, 
-		    $body_hash->{'server_type'}, 
+		    $body_hash->{'hd_name'}, 
+		    $body_hash->{'hd_size'}, 
+		    $body_hash->{'hd_used' },
+		    $body_hash->{'hd_free'}, 
+		    $body_hash->{'hd_threhold'}, 
+		    $body_hash->{'hd_usepercent'}, 
+		    $body_hash->{'insert_time'}, 
 	      )
     );
 }
@@ -80,22 +82,48 @@ sub pre_headunpack {
       $head_hash->{'response_code'}, 
       $head_hash->{'record_length'}, 
       $head_hash->{'response_msg'}, 
-    ) = unpack(  $self->get_Head_Format  , $data  );
+    ) = unpack(  $self->get_Head_Format , $data  );
     return $head_hash;
 }
 
 sub pre_bodyunpack {
     my ( $self, $data ) = @_;
+    my $head_hash = $self->pre_headunpack( $data ); 
     my $body_hash = {};
-    ( $body_hash->{'node_index'},
-      $body_hash->{'server_ip'}, 
-      $body_hash->{'port'}, 
-      $body_hash->{'hostname'}, 
-      $body_hash->{'inserted_time'}, 
-      $body_hash->{'running_status'}, 
-      $body_hash->{'server_type'}, 
-    ) = unpack( 'x44 '.$self->get_Body_Format , $data );
-    return $body_hash;
+    
+    my $offset = 44 ;
+    my $offstr ;
+    
+    $body_hash->{'rows'} = [];
+    for ( 1..$head_hash->{'record_amount'} ) {
+	$offstr = 'x'.$offset;
+	dump( $offstr );
+	my ( 
+	     $node_index,
+      	     $hd_name, 
+      	     $hd_size, 
+      	     $hd_used, 
+      	     $hd_free, 
+      	     $hd_threhold, 
+      	     $hd_usepercent, 
+      	     $insert_time 
+    	) = unpack( $offstr . $self->get_Body_Format , $data );
+	my $row = { 
+		    'nodeindex'      => $node_index, 
+		    'hd_no'          => $hd_name, 
+		    'hd_no_size'     => $hd_size, 
+		    'hd_used_size'   => $hd_used, 
+		    'hd_free_size'   => $hd_free,
+		    'hd_threhold'    => $hd_threhold, 
+		    'hd_usepercent'  => $hd_usepercent, 
+		    'inserted_times' => $insert_time 
+	};
+        push @{ $body_hash->{'rows'} } , $row;
+	$offset += int( $head_hash->{'record_length'} );
+    }
+    foreach my $item ( keys %$body_hash ) {  $head_hash->{ $item } = $body_hash->{ $item } };
+    
+    return $head_hash;
 }
 
 ############################################
@@ -103,41 +131,27 @@ sub pre_bodyunpack {
 ############################################
 sub encode {
     my ( $self, $dthash ) = @_;
-    dump( $dthash );
-    #            --------44-------- =====================
-    #$buf = pack('A2 A4 A4 A6 A4 A24 A32 A16 A6 A14 A2 A2' , values %$data );
     if( $self->check_msgvalid( $dthash ) ) { return undef };
-    $self->pre_bodypack( $dthash  );
+    $self->pre_bodypack( $dthash );
     $self->pre_headpack( $dthash );
     return $self->datadump;
 }
 
 sub decode {
     my $self = shift;
-    say 'I am decode_1001';
+    say 'I am decode_1030';
     return undef unless  $self->package ;
-    if( length( $self->package ) != 179 ) { return undef; }
+    #if( length( $self->package ) != 226 ) { return undef; }
     my $hdhash   = $self->pre_bodyunpack( $self->package );
-    my $bodyhash = $self->pre_headunpack( $self->package );
+    #my $bodyhash = $self->pre_headunpack( $self->package );
     dump( $hdhash );
-    #my %hash = ( %$hdhash, %$bodyhash ) ;
-    foreach my $item ( keys %$bodyhash ) {  $hdhash->{ $item } = $bodyhash->{ $item } };
     return  $hdhash ;
 }
 
 sub check_msgvalid {
     my ( $self ,$data ) = @_;
-   
-    unless( exists $data->{ 'node_index' } &&  
-	    exists $data->{ 'server_ip' } &&
-            exists $data->{ 'port' } &&
-            exists $data->{ 'inserted_time' } &&
-            exists $data->{ 'running_status' } &&
-            exists $data->{ 'server_type' }   &&
-            exists $data->{ 'txntype' }    &&
-	    exists $data->{ 'hostname' } 
+    unless( exists $data->{ 'node_index' } 
     ) {
-
             confess "msg invaild ,checking the datagram!" ;
             return 1;
     }
@@ -145,7 +159,8 @@ sub check_msgvalid {
 }
 sub test {
     my $self = shift;
-    dump('i am 1001');
+    dump('i am 1030');
 }
+
 
 1;

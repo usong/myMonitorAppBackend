@@ -26,7 +26,7 @@ __PACKAGE__->table("NODES");
 =head2 node_index
 
   data_type: 'varchar2'
-  is_nullable: 1
+  is_nullable: 0
   size: 32
 
 =head2 monitor_ip
@@ -72,7 +72,7 @@ __PACKAGE__->table("NODES");
 
 __PACKAGE__->add_columns(
   "node_index",
-  { data_type => "varchar2", is_nullable => 1, size => 32 },
+  { data_type => "varchar2", is_nullable => 0, size => 32 },
   "monitor_ip",
   { data_type => "varchar2", is_nullable => 1, size => 15 },
   "monitor_port",
@@ -102,9 +102,21 @@ __PACKAGE__->add_columns(
   },
 );
 
+=head1 PRIMARY KEY
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-03 22:37:03
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:NtzRwNDoa/HRl19x3VQrsQ
+=over 4
+
+=item * L</node_index>
+
+=back
+
+=cut
+
+__PACKAGE__->set_primary_key("node_index");
+#__PACKAGE__->has_many('node_index' => 'Util::Schema::Result::NodeSystemInfo');
+
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-19 19:45:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bfTEMr9Qqf+nxctuqgDIMA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

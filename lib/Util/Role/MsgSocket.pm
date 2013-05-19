@@ -26,15 +26,15 @@ sub comm {
 		my $socket = new LWP::Socket;
 		$socket->connect( $self->server_ip, $self->port ); # echo
 		$socket->write( $sendbuf );
-		$socket->read( \$buf , 5 , 15 );
+		$socket->read( \$buf , 5 , 25 );
 		dump( $buf );
 		if( $buf =~ /^\d+$/ ) {
-			$socket->read( \$data , int( $buf ) - 5 , 15 );
+			$socket->read( \$data , int( $buf ) - 5 , 25 );
 			dump( $data );
 	       	 	$self->package( $data );
 			$socket = undef;  # close
 		} else {
-			dump( 'package is invalid.please checking the package from remote host' );
+			dump( 'package be found invalid.please checking the package from remote host' );
 			$socket = undef;  # close
 			return undef;
 		}

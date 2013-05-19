@@ -119,6 +119,7 @@ sub decode {
     my $self = shift;
     say 'I am decode_1005';
    
+    return undef unless  $self->package ;
     if( length( $self->package ) != 226 ) { return undef; }
     my $hdhash   = $self->pre_bodyunpack( $self->package );
     my $bodyhash = $self->pre_headunpack( $self->package );
