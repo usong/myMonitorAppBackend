@@ -113,7 +113,9 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("node_index");
-#__PACKAGE__->has_many('node_index' => 'Util::Schema::Result::NodeSystemInfo');
+#__PACKAGE__->has_many( SYSIFNO => 'Util::Schema::Result::NodeSystemInfo', 'node_index');
+__PACKAGE__->belongs_to( SYSINFO=>'Util::Schema::Result::NodeSystemInfo','node_index' );
+
 
 # Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-19 19:45:36
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bfTEMr9Qqf+nxctuqgDIMA

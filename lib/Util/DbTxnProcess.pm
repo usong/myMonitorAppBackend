@@ -1,10 +1,11 @@
 package Util::DbTxnProcess; 
 
 use Moose;
-
+use Data::Dump qw/dump/;
 sub insert_node_and_sysinfo {
 
-	my ( $self , $nodesrow , $sysinforow  , $schema ) = @_;
+	my ( $self , $nodeindex , $nodesrow , $sysinforow  , $hdrowarray ,  $schema ) = @_;
+
 
 	eval {	
 		$schema->txn_begin();
@@ -19,6 +20,7 @@ sub insert_node_and_sysinfo {
 		     'running_status'    => $nodesrow->{'running_status'},
 		     'server_type'       => $nodesrow->{'server_type'}
 		});
+		#insert sysinfo
 		my $sysinfo = $schema->resultset('NodeSystemInfo');
 		$sysinfo->create({
 		     'node_index' 	 => $sysinforow->{'node_index'},
@@ -30,6 +32,20 @@ sub insert_node_and_sysinfo {
 		     'hd_size'           => $sysinforow->{'hdsize'},
 		     'hd_free_size'      => $sysinforow->{'hdfreesize'}
 		});
+		#insert hdinfo
+		my $hdinfo = $schema->resultset('NodeHdInfo');
+		foreach my $hd (  @{ $hdrowarray->{'rows'} }  ) {
+		     	$hdinfo->create( { 
+				'node_index'     => $nodeindex,
+				'hd_no'          => $hd->{'hd_no'}  ,
+				'hd_no_size'     => $hd->{'hd_no_size'}  ,
+				'hd_used_size'   => $hd->{'hd_used_size'}  ,
+				'hd_free_size'   => $hd->{'hd_free_size'}  ,
+				'hd_threhold'    => $hd->{'hd_threhold'}  ,
+				'hd_usepercent'  => $hd->{'hd_usepercent'}  ,
+				'inserted_times' => $hd->{'inserted_times'}  ,
+			});
+        	}
             
 	};
 	if( $@ ) { 
@@ -37,7 +53,7 @@ sub insert_node_and_sysinfo {
 		$schema->txn_rollback();
 		return 1;
 	} 
-        $schema->txn_commit();
+	$schema->txn_commit();
 	return 0;
 }
 

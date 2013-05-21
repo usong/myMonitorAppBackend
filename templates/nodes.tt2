@@ -8,9 +8,18 @@
 			  <div class='mycircle_out_class' id='mycircle[% node.node_index %]'>
 				  <img id='imgclose[% node.node_index %]' src='[% public_resource %]/img/del.png' style='display:none ;width: 18px; height: 18px'></img>
 			  </div>
-	         </div>
-            	 <img src='[% public_resource %]/img/add.png' style='width: 180px; height: 180px'>
-		 <a href="[% public_resource %]/node_view/[% node.node_index %]"><div class='caption'><p class="text-info">[% node.alias %]</p></div></a>
+		  </div>
+		 [% IF (matches = node.SYSINFO.opsys_info.match('Linux') ) %] 
+		 	<img src='[% public_resource %]/img/linux.PNG' style='width: 180px; height: 180px'>
+		 [% ELSIF (matches = node.SYSINFO.opsys_info.match('Windows') )  %]
+		 	<img src='[% public_resource %]/img/windows.PNG' style='width: 180px; height: 180px'>
+		 [% ELSIF (matches = node.SYSIFNO.opsys_info.match('Aix') )  %]
+		 	<img src='[% public_resource %]/img/aix.PNG' style='width: 180px; height: 180px'>
+		 [% ELSE  %]
+			<img src='[% public_resource %]/img/osx.PNG' style='width: 180px; height: 180px'>		
+		 [% END %]
+		 	<a href="[% public_resource %]/node_view/[% node.node_index %]"><div class='caption'><p class="text-info">
+ 	         [% node.SYSINFO.opsys_info %]</p></div></a>
 	      </div>
 	  </li>
 	[% END %]

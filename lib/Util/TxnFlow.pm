@@ -38,7 +38,7 @@ sub add_node_and_initialinfo {
 	#......continue........
 	$dp = undef;
 	########################################################################
-	#1007 get host info
+	#1005 get host info
 	########################################################################
 	$dp     = new Util::MessageDispatch;
 	$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
@@ -64,19 +64,48 @@ sub add_node_and_initialinfo {
 	
 	if( $result_1005->{ 'response_code' } ne '000000' ) {
 		return ( $result_1005->{ 'response_code' } , $result_1005->{ 'response_msg' } );
-	} else {
-		#dump( $result_1005 );
-		#return ( '000000' ,'here....3');
-		#insert into nodes node_system_info 
-		my $obj = new Util::DbTxnProcess;	
-		dump( $result_1001 );
-		dump( $result_1005 );
-		if( $obj->insert_node_and_sysinfo( $result_1001, $result_1005 , $schema  ) ) {
-			return ( '888888' , '1001_1005_database process failed' );
-		}
-		return ( $result_1005->{ 'response_code' } , $result_1005->{ 'response_msg' } );
+	} 
+	
+	$dp = undef;
+	########################################################################
+	#1030 get nodehd info
+	########################################################################
+	$dp     = new Util::MessageDispatch;
+	$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
+	my $data_1030 = 
+	{
+		'node_index' 	 => $nodeindex,
+		'hd_name'  	 => '0' ,
+		'hd_size'        => '0',
+		'hd_used'  	 => 0,
+		'hd_free'        => 0,
+		'hd_threhold'    => 0,
+		'hd_usepercent'  => 0,
+		'insert_time'    => 0,
+		'txntype'        => 1030,
 
+	};
+	my $result_1030 = $dp->disptach( undef, 1030, $data_1030 ); #1003  create a monitor server host
+	#dump( $result_1030 );	
+	unless( $result_1030 ) {
+		dump( $result_1030);
+		dump( 'failed!' );
+		return ( '999999' , 'comminication failed' );
 	}
+	if( $result_1030->{ 'response_code' } ne '000000' ) {
+		return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	}
+	else {
+		#dump( $result_1001 );
+		#dump( $result_1005 );
+		#dump( $result_1030 );
+		my  $obj = new Util::DbTxnProcess;
+		if( $obj->insert_node_and_sysinfo( $nodeindex , $result_1001, $result_1005 , $result_1030 , $schema  ) ) {
+			return ( '888888' , '1001_1005_1030_database process failed' );
+		}
+		return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	}
+
 }
 
 sub add_nodesvrtype {
@@ -117,6 +146,7 @@ sub add_nodesvrtype {
 	}	
 
 }	
+
 
 
 1;

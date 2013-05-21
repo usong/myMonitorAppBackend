@@ -4,7 +4,7 @@
              <ul class="nav nav-list">
                 <li class="nav-header">功能项</li>
                 <li><a href="[% node_view %]/[% node.node_index %]">主机信息一览</a></li>
-                <li class="active"><a href="[% node_cfgview %]/[% node_index %]">主机监控配置项</a>
+                <li class="active"><a href="[% node_cfgview %]/[% node.node_index %]">主机监控配置项</a>
 					<ul>
 			  		    <li><a href="[% hd_paramcfg_url %]/[% node.node_index %]">磁盘监控参数配置</a></li>
 					    <li><a href="[% mm_paramcfg_url %]/[% node.node_index %]">内存监控参数配置</a></li>

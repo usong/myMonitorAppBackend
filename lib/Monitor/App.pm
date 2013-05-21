@@ -7,7 +7,9 @@ use File::Spec ;
 use Data::Dump qw(dump);
 use Encode;
 use Util::ServerTypeTool;
+use DBIx::Class::Storage;
 use Util::TxnFlow;
+use 5.010;
 use utf8;
 our $VERSION = '0.1';
 
@@ -34,12 +36,21 @@ hook before_template_render => sub {
 
 any '/' => sub {
     	my $schema = Util::Basic->schema;
-    	my $job_rs = $schema->resultset('Node')->search( undef, {
-        	order_by => 'inserted_times DESC',
-        	rows => 8,
-        	page => 1,
-   	});
-   	template 'nodes.tt2',
+	#my $job_rs = $schema->resultset('Node')->search( undef, {
+        #	order_by => 'inserted_times DESC',
+        #	rows => 8,
+        #	page => 1,
+   	#});
+
+	my $job_rs = $schema->resultset('Node')->search( undef,
+	{   
+		       join=>'SYSINFO' , 
+		       prefetch => 'SYSINFO',
+		       rows => 8,
+		       page => 1, 
+	} 
+        );
+	template 'nodes.tt2',
 	{
      	    'nodes'           => [ $job_rs->all ] ,
   	};
@@ -47,19 +58,36 @@ any '/' => sub {
 
 
 any '/test' => sub {
-
-	my $schema = Util::Basic->schema;
+	#my $schema = Util::Basic->schema;
+	#$schema->storage->debug(1);
 	#Util::Schema::Result::Node->has_many( ccc => 'Util::Schema::Result::NodeSystemInfo', 'node_index');
 
 	#Util::Schema::Result::Node->has_many('NodeSystemInfo', 'Util::Schema::Result::NodeSystemInfo');
 	#Util::Schema::Result::NodeSystemInfo->belongs_to('Node', 'Util::Schema::Result::Node', 'node_index');
-	my $node_rs = $schema->resultset('Node')->search( {
-		order_by => 'inserted_times DESC',
-		rows => 8,
-		page => 1 } , { prefetch    => ['NodeSystemInfo']} );
-	my @array = $node_rs->node_index;
-	dump(@array);
-	dump( $node_rs->nodes );
+	#my $job_rs = $schema->resultset('Node')->search( undef,
+        #{   
+	#	       join=>'SYSINFO' , 
+	#	       prefetch => 'SYSINFO',
+	#} 
+        #);
+
+	#my $job_rs = $schema->resultset('Node')->search( undef,
+	#{   
+	#	       join=>'SYSINFO' , 
+	#	       prefetch => 'SYSINFO',
+	#	       rows => 8,
+	#	       page => 1, 
+	#} 
+        #);
+	#return $job_rs->first->SYSINFO->opsys_info;
+	#my $node_rs = $schema->resultset('Node')->search( {
+	#	'SYSIFNO.node_index' => '1368970126' } , { join=>'SYSIFNO' , prefetch => 'me.SYSIFNO'  }  );
+#return $node_rs->first->node_index;
+	#return $node_rs->first->SYSIFNO->node_index;
+	
+
+	#dump(@array);
+	#dump( $node_rs->nodes );
 #foreach  my $item  ( $node_rs->all ) {
 #
 #		dump( $item->node_index );
@@ -67,34 +95,34 @@ any '/test' => sub {
 #	}
 	
 
-	#my $config = Util::Basic->pconfig->{ 'MonitroServer' };
-	#my $dp = new Util::MessageDispatch;
-	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
+	my $config = Util::Basic->pconfig->{ 'MonitroServer' };
+	my $dp = new Util::MessageDispatch;
+	$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
        
-	#my $data_1030 = 
-	#{
-	#	'node_index' 	 => '1368970126',
-	#	'hd_name'  	 => '0' ,
-	#	'hd_size'        => '0',
-	#	'hd_used'  	 => 0,
-	#	'hd_free'        => 0,
-	#	'hd_threhold'    => 0,
-	#	'hd_usepercent'  => 0,
-	#	'insert_time'    => 0,
-	#	'txntype'        => 1030,
+	my $data_1030 = 
+	{
+		'node_index' 	 => '1369035938',
+		'hd_name'  	 => '0' ,
+		'hd_size'        => '0',
+		'hd_used'  	 => 0,
+		'hd_free'        => 0,
+		'hd_threhold'    => 0,
+		'hd_usepercent'  => 0,
+		'insert_time'    => 0,
+		'txntype'        => 1030,
 
-	#};
-	#my $result_1030 = $dp->disptach( undef, 1030, $data_1030 ); #1003  create a monitor server host
-	#
-	#unless( $result_1030 ) {
-	#	dump( $result_1030);
-	#	dump( 'failed!' );
-	#	return ( '999999' , 'comminication failed' );
-	#}
-	#if( $result_1030->{ 'response_code' } ne '000000' ) {
-	#	return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
-	#}
-	#return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	};
+	my $result_1030 = $dp->disptach( undef, 1030, $data_1030 ); #1003  create a monitor server host
+	
+	unless( $result_1030 ) {
+		dump( $result_1030);
+		dump( 'failed!' );
+		return ( '999999' , 'comminication failed' );
+	}
+	if( $result_1030->{ 'response_code' } ne '000000' ) {
+		return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	}
+	return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
 	#$dp = undef;
 	#$dp = new Util::MessageDispatch;
 	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
@@ -382,23 +410,28 @@ get '/hd_paramcfg/:node_index' => sub {
 	else {
 		my $schema = Util::Basic->schema;
 		my $nodeindex =  params->{node_index} ;
+		
 		my $node = $schema->resultset('Node')->search({
     			node_index => $nodeindex ,
   		})->first;
+		#check nodeindex valid 
+		#
+		#
+		##########################
 	        #hd config information
-        	my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search({
-    			node_index => $nodeindex ,
-  		});
+	        my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search({
+	        	node_index => $nodeindex ,
+	        });
 	        if(  scalar(@node_hdinfoset)  ){
-		    template 'node_hdcfg.tt2',
-		    {
-		    	'node_hds'            =>  \@node_hdinfoset,
-		    	'node'                =>  $node ,
-		    };	 
-		 } else {
-		    # #initial config 
-		    forward "404.html" ;
-	         }
+	            template 'node_hdcfg.tt2',
+	            {
+	            	'node_hds'            =>  \@node_hdinfoset,
+	            	'node'                =>  $node ,
+	            };	 
+	        } else {
+	            # #initial config 
+	            forward "404.html" ;
+	        }
 	}
 };
 

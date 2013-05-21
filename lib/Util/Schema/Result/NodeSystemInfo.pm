@@ -109,7 +109,7 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("node_index");
-#__PACKAGE__->belongs_to( 'node_index' => 'Util::Schema::Result::Node');
+#__PACKAGE__->belongs_to( NODE=>'Util::Schema::Result::Node','node_index' );
 
 # Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-19 19:46:54
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GrKtV9pm0Ra0OKk8plkwmQ

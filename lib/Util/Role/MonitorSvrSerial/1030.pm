@@ -25,7 +25,7 @@ sub pre_headpack {
 	'txnType' => $data->{ 'txntype' },
 	'record_amount' => '0001',
 	'response_code' => '000000',
-	'record_length' => '0182',
+	'record_length' => '0126',
  	'response_msg'  => '0',
     };
     dump($head_hash);
@@ -97,7 +97,6 @@ sub pre_bodyunpack {
     $body_hash->{'rows'} = [];
     for ( 1..$head_hash->{'record_amount'} ) {
 	$offstr = 'x'.$offset;
-	dump( $offstr );
 	my ( 
 	     $node_index,
       	     $hd_name, 
@@ -107,7 +106,7 @@ sub pre_bodyunpack {
       	     $hd_threhold, 
       	     $hd_usepercent, 
       	     $insert_time 
-    	) = unpack( $offstr . $self->get_Body_Format , $data );
+    	) = unpack( $offstr .' '. $self->get_Body_Format , $data );
 	my $row = { 
 		    'nodeindex'      => $node_index, 
 		    'hd_no'          => $hd_name, 
@@ -122,7 +121,6 @@ sub pre_bodyunpack {
 	$offset += int( $head_hash->{'record_length'} );
     }
     foreach my $item ( keys %$body_hash ) {  $head_hash->{ $item } = $body_hash->{ $item } };
-    
     return $head_hash;
 }
 
@@ -144,7 +142,7 @@ sub decode {
     #if( length( $self->package ) != 226 ) { return undef; }
     my $hdhash   = $self->pre_bodyunpack( $self->package );
     #my $bodyhash = $self->pre_headunpack( $self->package );
-    dump( $hdhash );
+    #dump( $hdhash );
     return  $hdhash ;
 }
 
