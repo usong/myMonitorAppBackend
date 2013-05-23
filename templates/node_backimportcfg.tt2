@@ -1,0 +1,47 @@
+<div class="row-fluid">
+          <div class="span3">
+           <div class="well sidebar-nav">
+             <ul class="nav nav-list">
+                <li class="nav-header">功能项</li>
+                <li><a href="[% node_view %]/[% node.node_index %]">主机信息一览</a></li>
+                <li><a href="[% node_cfgview %]/[% node.node_index %]">主机监控配置项</a>
+					<ul>
+			  		    <li class="active"><a href="[% hd_paramcfg_url %]/[% node.node_index %]">磁盘监控参数配置</a></li>
+					    <li><a href="[% mm_paramcfg_url %]/[% node.node_index %]">内存监控参数配置</a></li>
+					    <li><a href="[% process_paramcfg_url %]/[% node.node_index %]">进程监控参数配置</a></li>
+					    <li><a href="[% backup_paramcfg_url %]/[% node.node_index %]">备份参数配置</a></li>
+		  			</ul>
+		</li>
+		<li><a href="#">数据导入</a>
+			<ul>
+				<li class="active"><a href="[% node_dataimport_url %]/[% node_index %]">备份外部数据导入</a></li>
+			</ul>
+		</li>
+              </ul>
+            </div><!--/.well -->
+          </div><!--/span-->
+          <div class="span9">
+		 <p class="lead">主机IP:<span> [% node.monitor_ip %]</span> </p>
+		 <p class="lead">监控端口:<span> [% node.monitor_port %]</span></p>
+           <hr class="bs-docs-separator">
+           <h3>备份路径文件导入</h3>
+           <hr class="bs-docs-separator">
+	   <form action="[% node_dataimportok_url %]" method="post" enctype="multipart/form-data">
+	   <input type="hidden" name="node_index" value="[% node.node_index %]"></input> 
+	   <div class="control-group warning">
+ 		<div class="controls">
+			<label class="control-label">选择文件</label>
+			<input type="file" name="filename"></input>
+		</div>
+		<div class="controls">
+			<button type="submit" class="btn pull-center">上传</button>
+		</div>
+	   </div>
+	   </form> 
+	   <div class="alert alert-error"><h5>提示:</h5>
+		   <h6>导入新的备份路径文件，原有的备份参数将被清空,请慎重.</h6>
+		   <h6>导入备份路径文件，备份文件中每行存放一条备份路径.</h6>
+	   	   </div>
+          </div>
+        </div><!-- row-fluid -->
+      

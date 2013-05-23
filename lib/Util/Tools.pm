@@ -1,12 +1,7 @@
 package Util::Tools;
 
 use Moose;
-=pod
-{
-   { hd_no => '' } 
-   { 
-}
-=cut
+
 sub Array_Merge (\@\@) {
     my $self = shift;
     my @tmp = @_; #first array item length
@@ -31,6 +26,8 @@ sub GetBitValue (\@) {
     }
     return $value;
 }
+
+
 1;
 
 

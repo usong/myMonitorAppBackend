@@ -12,7 +12,7 @@ sub get_Head_Format {
 }
 sub get_Body_Format { 
 	my $self = shift; 
-	return "A32 A15 A6 A64 A14 A2 A2" 
+	return "A32 A15 A6 A64 A14 A2 A2 A6 A64 A32 A12 A12 A12 A12" 
 }
 
 #############################
@@ -45,7 +45,6 @@ sub pre_bodypack {
     my ( $self, $data ) = @_;
     #check data value
     my $body_hash = {
-	#'node_index'          => '0' x ( 32 - length ( $data->{ 'node_index' } ) ) . $data->{ 'node_index' } ,
 	'node_index'          => $data->{ 'node_index' },
 	'server_ip'           => $data->{ 'server_ip' },
 	'port'                => '0' x ( 6 - length ( $data->{ 'port' } ) ) . $data->{ 'port' },
@@ -53,6 +52,13 @@ sub pre_bodypack {
 	'inserted_time'       => $data->{ 'inserted_time' },
 	'running_status'      => $data->{ 'running_status' },
 	'server_type'         => $data->{ 'server_type' },
+	'cpunum'              => $data->{ 'cpunum' },
+	'cputype'             => $data->{ 'cputype' },
+	'opsys_info'          => $data->{ 'opsys_info' },
+	'mmsize'              => $data->{ 'mmsize' },
+	'mmfreesize'          => $data->{ 'mmfreesize' },
+	'hdsize'              => $data->{ 'hdsize' },
+	'hdfreesize'          => $data->{ 'hdfreesize' },
     };
     say '1001', $self->get_Body_Format; 
     $self->MsgBody(
@@ -64,6 +70,13 @@ sub pre_bodypack {
 		    $body_hash->{'inserted_time'}, 
 		    $body_hash->{'running_status'}, 
 		    $body_hash->{'server_type'}, 
+		    $body_hash->{'cpunum'}, 
+		    $body_hash->{'cputype'}, 
+		    $body_hash->{'opsys_info' },
+		    $body_hash->{'mmsize'}, 
+		    $body_hash->{'mmfreesize'}, 
+		    $body_hash->{'hdsize'}, 
+		    $body_hash->{'hdfreesize'}, 
 	      )
     );
 }
@@ -94,6 +107,13 @@ sub pre_bodyunpack {
       $body_hash->{'inserted_time'}, 
       $body_hash->{'running_status'}, 
       $body_hash->{'server_type'}, 
+      $body_hash->{'cpunum'}, 
+      $body_hash->{'cputype'}, 
+      $body_hash->{'opsys_info'}, 
+      $body_hash->{'mmsize'}, 
+      $body_hash->{'mmfreesize'}, 
+      $body_hash->{'hdsize'}, 
+      $body_hash->{'hdfreesize'}, 
     ) = unpack( 'x44 '.$self->get_Body_Format , $data );
     return $body_hash;
 }
@@ -105,7 +125,6 @@ sub encode {
     my ( $self, $dthash ) = @_;
     dump( $dthash );
     #            --------44-------- =====================
-    #$buf = pack('A2 A4 A4 A6 A4 A24 A32 A16 A6 A14 A2 A2' , values %$data );
     if( $self->check_msgvalid( $dthash ) ) { return undef };
     $self->pre_bodypack( $dthash  );
     $self->pre_headpack( $dthash );
@@ -116,7 +135,7 @@ sub decode {
     my $self = shift;
     say 'I am decode_1001';
     return undef unless  $self->package ;
-    if( length( $self->package ) != 179 ) { return undef; }
+    if( length( $self->package ) != 329 ) { say "pkg len invalid";  return undef; }
     my $hdhash   = $self->pre_bodyunpack( $self->package );
     my $bodyhash = $self->pre_headunpack( $self->package );
     dump( $hdhash );

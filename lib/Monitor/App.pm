@@ -1,16 +1,17 @@
 package Monitor::App;
 use Dancer ':syntax';
 use Dancer::Plugin::Ajax;
-use Util::Basic;
-use Util::Tools;
-use File::Spec ;
+use Plack::Request::Upload;
 use Data::Dump qw(dump);
 use Encode;
+use Util::Basic;
+use Util::Tools;
 use Util::ServerTypeTool;
 use DBIx::Class::Storage;
 use Util::TxnFlow;
 use 5.010;
 use utf8;
+use POSIX qw(strftime); 
 our $VERSION = '0.1';
 
 set 'views'  => path( Util::Basic->proot, 'templates' );
@@ -29,9 +30,13 @@ hook before_template_render => sub {
     $tokens->{mm_paramcfg_url}   =  uri_for('/mm_paramcfg');#  /* mm_param */
     $tokens->{process_paramcfg_url}   =  uri_for('/process_paramcfg');  #/* process_param */
     $tokens->{backup_paramcfg_url}   =  uri_for('/backup_paramcfg');  #/* backup_param */
+
+    $tokens->{param_backupconfig_url}   =  uri_for('/param_backupconfigok');#  /* hd_param config ok */
     $tokens->{param_hdconfig_url}   =  uri_for('/param_hdconfigok');#  /* hd_param config ok */
     $tokens->{param_processconfig_url}   =  uri_for('/param_processconfigok');#  /* process_param config ok */
     $tokens->{node_addconfig_url}   =  uri_for('/node_addprocess');#  /* process_param config ok */
+    $tokens->{node_dataimport_url}   =  uri_for('/backup_dataimport');#  /* process_param config ok */
+    $tokens->{node_dataimportok_url}   =  uri_for('/backup_dataimportok');#  /* process_param config ok */
 };
 
 any '/' => sub {
@@ -58,10 +63,14 @@ any '/' => sub {
 
 
 any '/test' => sub {
+
+	#my $obj = new Util::Tools;
+
+	#return $obj->GetCurrentTime;
 	#my $schema = Util::Basic->schema;
 	#$schema->storage->debug(1);
 	#Util::Schema::Result::Node->has_many( ccc => 'Util::Schema::Result::NodeSystemInfo', 'node_index');
-
+	
 	#Util::Schema::Result::Node->has_many('NodeSystemInfo', 'Util::Schema::Result::NodeSystemInfo');
 	#Util::Schema::Result::NodeSystemInfo->belongs_to('Node', 'Util::Schema::Result::Node', 'node_index');
 	#my $job_rs = $schema->resultset('Node')->search( undef,
@@ -95,34 +104,34 @@ any '/test' => sub {
 #	}
 	
 
-	my $config = Util::Basic->pconfig->{ 'MonitroServer' };
-	my $dp = new Util::MessageDispatch;
-	$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
+	#my $config = Util::Basic->pconfig->{ 'MonitroServer' };
+	#my $dp = new Util::MessageDispatch;
+	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
        
-	my $data_1030 = 
-	{
-		'node_index' 	 => '1369035938',
-		'hd_name'  	 => '0' ,
-		'hd_size'        => '0',
-		'hd_used'  	 => 0,
-		'hd_free'        => 0,
-		'hd_threhold'    => 0,
-		'hd_usepercent'  => 0,
-		'insert_time'    => 0,
-		'txntype'        => 1030,
+	#my $data_1030 = 
+	#{
+	#	'node_index' 	 => '1369035938',
+	#	'hd_name'  	 => '0' ,
+	#	'hd_size'        => '0',
+	#	'hd_used'  	 => 0,
+	#	'hd_free'        => 0,
+	#	'hd_threhold'    => 0,
+	#	'hd_usepercent'  => 0,
+	#	'insert_time'    => 0,
+	#	'txntype'        => 1030,
 
-	};
-	my $result_1030 = $dp->disptach( undef, 1030, $data_1030 ); #1003  create a monitor server host
-	
-	unless( $result_1030 ) {
-		dump( $result_1030);
-		dump( 'failed!' );
-		return ( '999999' , 'comminication failed' );
-	}
-	if( $result_1030->{ 'response_code' } ne '000000' ) {
-		return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
-	}
-	return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	#};
+	#my $result_1030 = $dp->disptach( undef, 1030, $data_1030 ); #1003  create a monitor server host
+	#
+	#unless( $result_1030 ) {
+	#	dump( $result_1030);
+	#	dump( 'failed!' );
+	#	return ( '999999' , 'comminication failed' );
+	#}
+	#if( $result_1030->{ 'response_code' } ne '000000' ) {
+	#	return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
+	#}
+	#return ( $result_1030->{ 'response_code' } , $result_1030->{ 'response_msg' } );
 	#$dp = undef;
 	#$dp = new Util::MessageDispatch;
 	#$dp->setting(  $config->{'server_ip'} , $config->{'port'} );
@@ -464,6 +473,83 @@ post '/param_hdconfigok' => sub {
 		};	 
 	}
 
+};
+get '/backup_paramcfg/:node_index' => sub {
+	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex =  params->{node_index} ;
+		my $node = $schema->resultset('Node')->search({
+    			node_index => $nodeindex ,
+  		})->first;
+	
+	        #hd config information
+	        my @node_backupset = $schema->resultset('NodeBackupInfo')->search({
+	        	node_index => $nodeindex ,
+	        });
+	        for my $item ( @node_backupset ) {
+			$item->backup_param(  Encode::decode('gb2312',$item->backup_param ) );
+		}
+
+		dump( '张' );
+		dump( Encode::encode('UTF-8', '张' ) );
+		if( scalar( @node_backupset )  ){
+	            template 'node_backupcfg.tt2',
+	            {
+	            	'node_backupset'      =>  \@node_backupset,
+	            	'node'                =>  $node ,
+ 	            };	 
+	        } else {
+	            forward "404.html" ;
+	        }
+	}
+	
+};
+
+#backup import setting
+get '/backup_dataimport/:node_index' => sub {
+	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex =  params->{node_index} ;
+	    	my $node = $schema->resultset('Node')->search({
+    			node_index => $nodeindex ,
+  		})->first; 
+
+	        template 'node_backimportcfg.tt2',
+	        {
+	        	'node'                =>  $node ,
+	        };	 
+	}
+};
+
+post '/backup_dataimportok' => sub {
+
+	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $uploads = request->uploads->{'filename'};
+		#dump( $uploads );
+		#dump( request->uri_base );
+		my $fh = $uploads->file_handle; 
+		my $result = 0;
+		my $obj = new Util::TxnFlow;
+		my ( $rlt , $msg )  = $obj->add_backuppath( params->{node_index} , $fh );
+		if( $rlt ne '000000' ) {
+			redirect '500.html';
+			$result = 1;
+		} 
+		template 'node_backimportcfgok.tt2',
+	       	{
+	        	'db_result'    =>  $result ,
+			'node_index'   =>  params->{node_index},
+	       	};
+	}
 };
 
 true;

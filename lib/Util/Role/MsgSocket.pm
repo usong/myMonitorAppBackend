@@ -25,6 +25,7 @@ sub comm {
 	eval {
 		my $socket = new LWP::Socket;
 		$socket->connect( $self->server_ip, $self->port ); # echo
+		#dump( $sendbuf  );
 		$socket->write( $sendbuf );
 		$socket->read( \$buf , 5 , 25 );
 		dump( $buf );

@@ -14,7 +14,7 @@
 		</li>
 		<li><a href="#">数据导入</a>
 			<ul>
-				<li><a href="[% node_dataimport_url %]/[% node_index %]">备份外部数据导入</a></li>
+				<li class="active"><a href="[% node_dataimport_url %]/[% node_index %]">备份外部数据导入</a></li>
 			</ul>
 		</li>
               </ul>
@@ -22,10 +22,10 @@
           </div><!--/span-->
           <div class="span9">
 	    [%IF db_result == 0 %]
-            	<h3>磁盘监控参数配置成功</h3>
+            	<h3>备份路径文件导入成功</h3>
 		<hr class="bs-docs-separator">
 	    [% ELSE %]
-	        <h3>磁盘监控参数配置失败，请联系管理员!</h3>
+	        <h3>备份路径文件导入失败!</h3>
 		<hr class="bs-docs-separator">
 	    [% END %]
           </div>

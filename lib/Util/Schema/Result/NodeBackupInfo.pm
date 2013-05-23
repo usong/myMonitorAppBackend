@@ -76,6 +76,8 @@ __PACKAGE__->add_columns(
   { data_type => "varchar2", is_nullable => 1, size => 14 },
 );
 
+#__PACKAGE__->load_components(qw/UTF8Columns/);
+#__PACKAGE__->utf8_columns(qw/backup_param/);
 
 # Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-03 22:37:04
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Xc3CdeaoPcS5U5dbK1dVRA
