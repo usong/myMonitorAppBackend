@@ -1,7 +1,6 @@
 package Monitor::App;
 use Dancer ':syntax';
 use Dancer::Plugin::Ajax;
-use Plack::Request::Upload;
 use Data::Dump qw(dump);
 use Encode;
 use Util::Basic;
@@ -37,6 +36,7 @@ hook before_template_render => sub {
     $tokens->{node_addconfig_url}   =  uri_for('/node_addprocess');#  /* process_param config ok */
     $tokens->{node_dataimport_url}   =  uri_for('/backup_dataimport');#  /* process_param config ok */
     $tokens->{node_dataimportok_url}   =  uri_for('/backup_dataimportok');#  /* process_param config ok */
+
 };
 
 any '/' => sub {
@@ -61,9 +61,26 @@ any '/' => sub {
   	};
 };
 
+ajax '/test'  => sub {
 
-any '/test' => sub {
 
+	dump( request );
+        dump( request->body );	
+      	
+
+	my $data = from_json( request->body );
+	dump( $data );
+        	
+	{
+        	timestamp => time,
+        
+    	};
+
+
+};
+
+#any '/test' => sub {
+	
 	#my $obj = new Util::Tools;
 
 	#return $obj->GetCurrentTime;
@@ -188,7 +205,7 @@ any '/test' => sub {
 	#return  $buf;
 =cut
 
-};
+#};
 
 get '/node_add' => sub {
 	template 'node_add.tt2',
@@ -490,11 +507,9 @@ get '/backup_paramcfg/:node_index' => sub {
 	        	node_index => $nodeindex ,
 	        });
 	        for my $item ( @node_backupset ) {
-			$item->backup_param(  Encode::decode('gb2312',$item->backup_param ) );
+			$item->backup_dir(  Encode::decode('gb2312',$item->backup_dir ) );
 		}
 
-		dump( '张' );
-		dump( Encode::encode('UTF-8', '张' ) );
 		if( scalar( @node_backupset )  ){
 	            template 'node_backupcfg.tt2',
 	            {

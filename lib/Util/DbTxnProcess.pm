@@ -77,14 +77,22 @@ sub insert_backup_path {
 	eval {	
 		$schema->txn_begin();
 		#insert nodes table 
+		my $ix = 1;
 		while( <$filehandle> ) {
 			my $backup = $schema->resultset('NodeBackupInfo');
 			$backup->create({
 			     'node_index' 	 => $node_index,
+			     'backup_no'         => $ix++,
+			     'backup_servers'  	 => '0',
 			     'backup_time'  	 => '0',
-			     'backup_ftp'        => '0',
-			     'backup_param'      => $_,
-			     'backup_desc'       => '0',
+			     'backup_prename'  	 => '0',
+			     'backup_dir'  	 => $_,
+			     'backup_interval'   => '0',
+			     'ftp_username'      => '0',
+			     'ftp_passwd'        => '0',
+			     'ftp_ip'       	 => '0',
+			     'ftp_path'        	 => '0',
+			     'del_interval'      => '0',
 			     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
 			});
 		}

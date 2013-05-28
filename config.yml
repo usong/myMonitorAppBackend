@@ -27,3 +27,8 @@ engines:
     start_tag: '[%'
     end_tag:   '%]'
     WRAPPER: 'index.tt2'
+
+plugins:
+  'Ajax':
+    content_type: 'application/json'
+

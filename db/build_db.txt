@@ -107,21 +107,27 @@ create table node_process_collect (
 
 /* 节点备份结果 */
 create table node_backup_info (
-	node_index	  VARCHAR2(32),  /* 监控节点唯一索引 */
-	backup_time       VARCHAR2(15),  /* 定时备份时间 */
-	backup_ftp        VARCHAR2(20),   /* 备份上送FTP */
-	backup_param      VARCHAR2(1024), /* 备份下发参数  */
-	backup_desc       VARCHAR2(512)   /* 备份结果 暂不用*/
-	inserted_times    VARCHAR2(14)    /* 更新时间 */
+	node_index	  VARCHAR2(32),  
+	backup_no	  VARCHAR2(32),    /* 路径索引 */
+	backup_servers    NUMBER(4),       /* 总项 */
+	backup_time       VARCHAR2(8),   
+	backup_prename    VARCHAR2(20),    /* 压缩项 */ 
+	backup_dir    	  VARCHAR2(128),   /* 压缩项 */ 
+	backup_interval   NUMBER(4),       /* 压缩项 */ 
+	ftp_username      VARCHAR2(32),   
+	ftp_passwd        VARCHAR2(32),   
+	ftp_ip 		  VARCHAR2(15),   
+	ftp_path 	  VARCHAR2(128),   
+	del_interval      NUMBER(4),       /* 删除项 */
+	inserted_times    VARCHAR2(14)    
 )
 /* 节点备份结果采集 */
 create table node_backup_collect (
-	node_index	  VARCHAR2(32),  /* 监控节点唯一索引 */
-	backup_time       VARCHAR2(15),  /* 定时备份时间 */
-	backup_ftp        VARCHAR2(20),   /* 备份上送FTP */
-	backup_param      VARCHAR2(1024), /* 备份下发参数  */
-	backup_desc       VARCHAR2(512)   /* 备份结果 暂不用*/
-	inserted_times    VARCHAR2(14)    /* 更新时间 */
+	node_index	  VARCHAR2(32),  
+	backupexec_times  VARCHAR2(14)   
+	backup_servers    NUMBER(4),     
+	backup_resultdesc VARCHAR2(1024),    
+	inserted_times    VARCHAR2(14)     
 )
 /* 事件 */
 create table node_event (

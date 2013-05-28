@@ -28,5 +28,6 @@
 	  <h3 class="muted"><a href="[% request.uri_base  %]">Monitor App</a></h3>
         </div>
 		[% content %]
-    </div>    
+
+
     <!--<script type="text/javascript" src="[% public_resource %]/monitorapp.dart.js"></script>--></body></html>

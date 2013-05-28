@@ -29,29 +29,24 @@ __PACKAGE__->table("NODE_BACKUP_COLLECT");
   is_nullable: 1
   size: 32
 
-=head2 backup_time
+=head2 backupexec_times
 
   data_type: 'varchar2'
   is_nullable: 1
-  size: 15
+  size: 14
 
-=head2 backup_ftp
+=head2 backup_servers
 
-  data_type: 'varchar2'
+  data_type: 'numeric'
   is_nullable: 1
-  size: 20
+  original: {data_type => "number"}
+  size: [4,0]
 
-=head2 backup_param
+=head2 backup_resultdesc
 
   data_type: 'varchar2'
   is_nullable: 1
   size: 1024
-
-=head2 backup_desc
-
-  data_type: 'varchar2'
-  is_nullable: 1
-  size: 512
 
 =head2 inserted_times
 
@@ -64,21 +59,24 @@ __PACKAGE__->table("NODE_BACKUP_COLLECT");
 __PACKAGE__->add_columns(
   "node_index",
   { data_type => "varchar2", is_nullable => 1, size => 32 },
-  "backup_time",
-  { data_type => "varchar2", is_nullable => 1, size => 15 },
-  "backup_ftp",
-  { data_type => "varchar2", is_nullable => 1, size => 20 },
-  "backup_param",
+  "backupexec_times",
+  { data_type => "varchar2", is_nullable => 1, size => 14 },
+  "backup_servers",
+  {
+    data_type => "numeric",
+    is_nullable => 1,
+    original => { data_type => "number" },
+    size => [4, 0],
+  },
+  "backup_resultdesc",
   { data_type => "varchar2", is_nullable => 1, size => 1024 },
-  "backup_desc",
-  { data_type => "varchar2", is_nullable => 1, size => 512 },
   "inserted_times",
   { data_type => "varchar2", is_nullable => 1, size => 14 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-09 18:45:59
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:QN76A47cK2SjQ56T3o3sCQ
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-27 17:36:27
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ULNqe8jVjP+hhsVFl9528g
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
