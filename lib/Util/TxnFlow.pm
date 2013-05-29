@@ -148,7 +148,7 @@ sub add_nodesvrtype {
 	}	
 
 }	
-
+#import backuppath
 sub add_backuppath {
 	my ( $self , $nodeindex , $filehandle  ) = @_;
 	my  $schema = Util::Basic->schema;
@@ -159,7 +159,16 @@ sub add_backuppath {
 	return ( '000000' , 'succesfully!' );
 }	
 
+sub add_backupparamcfg {
 
+	my ( $self , $nodeindex , $data  ) = @_;
+	my  $schema = Util::Basic->schema;
+	my  $obj = new Util::DbTxnProcess;
+	if( $obj->update_backuppara_path( $nodeindex , $data,   $schema  ) ) {
+		return ( '888888' , 'update_backuppara_path process failed' );
+	}
+	return ( '000000' , 'succesfully!' );
+}
 
 
 1;

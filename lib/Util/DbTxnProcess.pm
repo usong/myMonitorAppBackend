@@ -105,4 +105,46 @@ sub insert_backup_path {
 	$schema->txn_commit();
 	return 0;
 }
+
+
+sub update_backuppara_path {
+
+	my ( $self ,$node_index, $data , $schema ) = @_;
+	eval {	
+		$schema->txn_begin();
+		#insert nodes table 
+		my $backup = $schema->resultset('NodeBackupInfo');
+		dump( $node_index );
+		for my $row ( @{ $data->{'row'} } ) {
+			dump( $row );
+			my $typeset = $backup->search({
+				node_index => $node_index ,
+				backup_no  => $row->[0]  ,
+			});
+			dump(  $row->[0] );
+			dump(  $row->[2] );
+			dump(  $row->[3] );
+			dump(  $row->[4] );
+			dump(  $row->[5] );
+			$typeset->update( { 
+					'backup_time' 	  => $data->{"backuptime"} , 
+					'backup_interval' => $row->[4]  , 
+					'del_interval' 	  => $row->[5]  , 
+					'ftp_path' 	  => $row->[3]  ,
+					'backup_prename'  => $row->[2]  ,
+					'ftp_username' 	  => $data->{"ftpuser"}  , 
+					'ftp_passwd' 	  => $data->{"ftppwd"}  , 
+					'ftp_ip' 	  => $data->{"ftpip"}  , 
+					'ftp_port' 	  => $data->{"ftpport"}  , 
+			} );
+		}
+	};
+	if( $@ ) { 
+		print "Failed Manutiplate Database UpData or Insert,\n" ;
+		$schema->txn_rollback();
+		return 1;
+	} 
+	$schema->txn_commit();
+	return 0;
+}
 1;

@@ -61,22 +61,25 @@ any '/' => sub {
   	};
 };
 
-ajax '/test'  => sub {
+# backupconfig process route
+ajax '/param_backupconfigok'  => sub {
 
-
-	dump( request );
-        dump( request->body );	
-      	
-
+	#dump( request );
+	#dump( request->body );	
 	my $data = from_json( request->body );
-	dump( $data );
-        	
-	{
-        	timestamp => time,
-        
-    	};
-
-
+	#dump( $data );
+	my $nodeindex = $data->{ "node_index" } ;
+	my  $schema = Util::Basic->schema;
+	my $node = $schema->resultset('NodeBackupInfo')->search({
+    			node_index => $nodeindex ,
+  	});
+	return { result => "999999", }  unless( $node->count );
+	my $obj = new Util::TxnFlow ;
+	my ( $rlt , $msg ) = $obj->add_backupparamcfg( $nodeindex ,$data );
+	
+	return { 
+		result => $rlt ne '0' x 6 ? $rlt : '0' x 6,
+	};	
 };
 
 #any '/test' => sub {
@@ -506,14 +509,32 @@ get '/backup_paramcfg/:node_index' => sub {
 	        my @node_backupset = $schema->resultset('NodeBackupInfo')->search({
 	        	node_index => $nodeindex ,
 	        });
+
+		my $paramhash = {
+			'ftp_username' 	  => ''  , 
+			'ftp_passwd' 	  => ''  , 
+			'ftp_ip' 	  => ''  , 
+			'ftp_port' 	  => ''  ,
+			'backup_time' 	  => ''  , 
+		};
 	        for my $item ( @node_backupset ) {
 			$item->backup_dir(  Encode::decode('gb2312',$item->backup_dir ) );
+			$item->backup_prename(  Encode::decode('gb2312',$item->backup_prename ) );
+			$item->ftp_path(  Encode::decode('gb2312',$item->ftp_path ) );
+			$item->ftp_username(  Encode::decode('gb2312',$item->ftp_username ) );
+			$paramhash->{'ftp_username'} = $item->ftp_username  ; 
+			$paramhash->{'ftp_passwd'  } = $item->ftp_passwd  ; 
+			$paramhash->{'ftp_ip' 	 } = $item->ftp_ip  ; 
+			$paramhash->{'ftp_port' 	 } = $item->ftp_port  ; 
+			$paramhash->{'backup_time' } = $item->backup_time  ;   
 		}
+	
 
 		if( scalar( @node_backupset )  ){
 	            template 'node_backupcfg.tt2',
 	            {
 	            	'node_backupset'      =>  \@node_backupset,
+	            	'totalinfo'           =>  $paramhash,
 	            	'node'                =>  $node ,
  	            };	 
 	        } else {

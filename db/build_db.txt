@@ -117,6 +117,7 @@ create table node_backup_info (
 	ftp_username      VARCHAR2(32),   
 	ftp_passwd        VARCHAR2(32),   
 	ftp_ip 		  VARCHAR2(15),   
+	ftp_port 	  VARCHAR2(6),   
 	ftp_path 	  VARCHAR2(128),   
 	del_interval      NUMBER(4),       /* 删除项 */
 	inserted_times    VARCHAR2(14)    
