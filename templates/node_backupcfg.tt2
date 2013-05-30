@@ -82,7 +82,7 @@
 		  <th>ftp子路径</th>
                   <th>备份间隔(小时)</th>
 		  <th>删除间隔(小时)</th>
-		  <th>状态</th>
+		  <th>功能</th>
                 </tr>
               </thead>
               <tbody>
@@ -94,11 +94,20 @@
 			<td><input type="text"  class="input-small" value="[% info.ftp_path %]"></td>
                   	<td><input type="text"  class="input-mini" value="[% info.backup_interval %]"></td>
 			<td><input type="text"  class="input-mini" value="[% info.del_interval %]"></td> 
-			[% IF info.backup_servers == 0 %] 
-				<td>已停用</td> 
-			[% ELSE %]  
-				<td>已启用</td> 
-			[% END %]
+			<td>
+				[% FOREACH backupnos IN  backupno_hash %]
+					[% IF backupnos.key == info.backup_no %]
+						[% FOREACH c IN  backupnos.value %]
+							[% IF c.value.has_types == '1' %]	
+								<input type="checkbox" id="chk_compress"  checked="true">[% c.value.desc %]</input>
+							[% ELSE %]
+								<input type="checkbox" id="chk_compress">[% c.value.desc %]</input>
+							[% END %]
+						[% END %]
+					[% END %]
+				[% END %]
+			</td> 
+		
 		</tr>
 		[% END %]
 	      </tbody>
@@ -107,8 +116,6 @@
 	     <br /><br />
 	     <div class="alert" id="alert_tip" style="display : none"><h5></h5></div>
 	     <input type="hidden" id="node_index" value="[% node.node_index %]"></input> 
-
-
 	</section>
       </div><!-- second -->
 
@@ -122,8 +129,9 @@
     		  for (var property in myObject) {  
     		   s = s + "\n "+property +": " + myObject[property] ;  
     		  }  
-    		  alert(s);  
-    	     } ;
+    		  //alert(s);  
+	     };
+	     
 			
 	     $("#backupsave").click(function(){
 	     		var msg =   
@@ -146,10 +154,22 @@
 					}
 					if( $(this).children().length > 0 )   
 					{   
-                                                rowarray[index] = $(this).children("input").val();
+						if( $(this).children("input").attr("type") == "text" ) {
+							rowarray[index] = $(this).children("input").val();
+						} else {
+							var str ="";
+							$(this).children("input").each( function(){
+								if( $(this).attr("checked") == true ) {
+									str += '1';
+								} else {
+									str += '0';
+								}
+							});
+							rowarray[index] = str;	
+						}
 					} else {
 						rowarray[index] = $(this).text();
-					}	
+					}
 				});
 				msg.row[ix] = rowarray;
 				ix++;
@@ -167,7 +187,7 @@
 					if( msg.status == 200) { 
 						var resp = JSON.parse( msg.response );
 						//alert( dump_obj( msg.response ) );
-						alert(  resp.result );
+						//alert(  resp.result );
 						if( resp.result == "000000" ) {
 							$("#alert_tip").find("h5").html("提示:\n备份参数设置成功!") ;
 							$("#alert_tip").attr("class" , "alert alert-tip"); 

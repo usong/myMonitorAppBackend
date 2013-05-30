@@ -3,6 +3,7 @@ package Util::DbTxnProcess;
 use Moose;
 use Data::Dump qw/dump/;
 use POSIX qw(strftime); 
+use Util::BackupTypeTool;
 sub insert_node_and_sysinfo {
 
 	my ( $self , $nodeindex , $nodesrow ,  $hdrowarray ,  $schema ) = @_;
@@ -78,20 +79,25 @@ sub insert_backup_path {
 		$schema->txn_begin();
 		#insert nodes table 
 		my $ix = 1;
+		my $backup = $schema->resultset('NodeBackupInfo');
+		my $typeset = $backup->search({
+			node_index => $node_index ,
+		});	
+		$typeset->delete;
 		while( <$filehandle> ) {
 			my $backup = $schema->resultset('NodeBackupInfo');
 			$backup->create({
 			     'node_index' 	 => $node_index,
 			     'backup_no'         => $ix++,
 			     'backup_servers'  	 => '0',
-			     'backup_time'  	 => '0',
-			     'backup_prename'  	 => '0',
+			     'backup_time'  	 => '00:00',
+			     'backup_prename'  	 => '/',
 			     'backup_dir'  	 => $_,
 			     'backup_interval'   => '0',
-			     'ftp_username'      => '0',
-			     'ftp_passwd'        => '0',
-			     'ftp_ip'       	 => '0',
-			     'ftp_path'        	 => '0',
+			     'ftp_username'      => '',
+			     'ftp_passwd'        => '',
+			     'ftp_ip'       	 => '',
+			     'ftp_path'        	 => '/',
 			     'del_interval'      => '0',
 			     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
 			});
@@ -107,6 +113,7 @@ sub insert_backup_path {
 }
 
 
+
 sub update_backuppara_path {
 
 	my ( $self ,$node_index, $data , $schema ) = @_;
@@ -114,18 +121,19 @@ sub update_backuppara_path {
 		$schema->txn_begin();
 		#insert nodes table 
 		my $backup = $schema->resultset('NodeBackupInfo');
-		dump( $node_index );
 		for my $row ( @{ $data->{'row'} } ) {
-			dump( $row );
+			my $obj = new Util::BackupTypeTool;
+			$row->[6] = $obj->getvalue_from_typestring( $row->[6] );
 			my $typeset = $backup->search({
 				node_index => $node_index ,
 				backup_no  => $row->[0]  ,
 			});
-			dump(  $row->[0] );
-			dump(  $row->[2] );
-			dump(  $row->[3] );
-			dump(  $row->[4] );
-			dump(  $row->[5] );
+			#dump(  $row->[0] );
+			#dump(  $row->[2] );
+			#dump(  $row->[3] );
+			#dump(  $row->[4] );
+			#dump(  $row->[5] );
+			#dump(  $row->[6] );
 			$typeset->update( { 
 					'backup_time' 	  => $data->{"backuptime"} , 
 					'backup_interval' => $row->[4]  , 
@@ -136,6 +144,7 @@ sub update_backuppara_path {
 					'ftp_passwd' 	  => $data->{"ftppwd"}  , 
 					'ftp_ip' 	  => $data->{"ftpip"}  , 
 					'ftp_port' 	  => $data->{"ftpport"}  , 
+					'backup_servers'  => $row->[6]  , 
 			} );
 		}
 	};

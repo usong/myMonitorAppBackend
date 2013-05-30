@@ -26,13 +26,13 @@ __PACKAGE__->table("NODE_HD_COLLECT");
 =head2 node_index
 
   data_type: 'varchar2'
-  is_nullable: 1
+  is_nullable: 0
   size: 32
 
 =head2 hd_no
 
   data_type: 'varchar2'
-  is_nullable: 1
+  is_nullable: 0
   size: 32
 
 =head2 hd_no_size
@@ -68,16 +68,16 @@ __PACKAGE__->table("NODE_HD_COLLECT");
 =head2 inserted_times
 
   data_type: 'varchar2'
-  is_nullable: 1
+  is_nullable: 0
   size: 14
 
 =cut
 
 __PACKAGE__->add_columns(
   "node_index",
-  { data_type => "varchar2", is_nullable => 1, size => 32 },
+  { data_type => "varchar2", is_nullable => 0, size => 32 },
   "hd_no",
-  { data_type => "varchar2", is_nullable => 1, size => 32 },
+  { data_type => "varchar2", is_nullable => 0, size => 32 },
   "hd_no_size",
   { data_type => "varchar2", is_nullable => 1, size => 12 },
   "hd_used_size",
@@ -89,12 +89,32 @@ __PACKAGE__->add_columns(
   "hd_usepercent",
   { data_type => "varchar2", is_nullable => 1, size => 6 },
   "inserted_times",
-  { data_type => "varchar2", is_nullable => 1, size => 14 },
+  { data_type => "varchar2", is_nullable => 0, size => 14 },
 );
 
+=head1 PRIMARY KEY
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-29 15:11:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4/Tym0pVkQrrXyZXs71k6w
+=over 4
+
+=item * L</node_index>
+
+=item * L</hd_no>
+
+=item * L</inserted_times>
+
+=back
+
+=cut
+
+__PACKAGE__->set_primary_key("node_index", "hd_no", "inserted_times");
+__PACKAGE__->has_many( hdinfos => 'Util::Schema::Result::NodeHdInfo', 
+{ 
+  'foreign.node_index' => 'self.node_index',
+  'foreign.hd_no'      => 'self.hd_no',
+});
+#
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-30 16:11:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ts8aTRqi+onF8zFMc5M4ag
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

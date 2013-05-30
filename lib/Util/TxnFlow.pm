@@ -4,6 +4,7 @@ use Moose;
 use Util::Basic;
 use Util::MessageDispatch;
 use Util::DbTxnProcess;
+
 use Data::Dump qw/dump/;
 
 sub add_node_and_initialinfo {
@@ -164,6 +165,7 @@ sub add_backupparamcfg {
 	my ( $self , $nodeindex , $data  ) = @_;
 	my  $schema = Util::Basic->schema;
 	my  $obj = new Util::DbTxnProcess;
+
 	if( $obj->update_backuppara_path( $nodeindex , $data,   $schema  ) ) {
 		return ( '888888' , 'update_backuppara_path process failed' );
 	}

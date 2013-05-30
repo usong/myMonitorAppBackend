@@ -14,7 +14,7 @@
 		</li>
 		<li><a href="#">数据导入</a>
 			<ul>
-				<li><a href="[% node_dataimport_url %]/[% node_index %]">备份外部数据导入</a></li>
+				<li><a href="[% node_dataimport_url %]/[% node.node_index %]">备份外部数据导入</a></li>
 			</ul>
 		</li>
               </ul>
@@ -45,13 +45,13 @@
                   <td value="[% hd.hd_no %]">[% hd.hd_no %]</td>
                   <td>[% hd.hd_no_size %]</td>
                   <td>[% hd.hd_used_size %]</td>
-                  <td>[% hd.hd_unused_size %]</td>
+                  <td>[% hd.hd_free_size %]</td>
 		  <td>[% hd.hd_usepercent %]</td>
 		  <td>
 	          <select name="threhold_items">
 		  <!--<option class="span1" value="[% hd.hd_threhold %]">[% hd.hd_threhold %]%</option>-->
 		  [% FOREACH op IN ['0' '70' '75' '80' '85' '90' ] %]
-		      [% IF op ==  hd.hd_threhold %]
+		      [% IF op ==  hd.hdinfos.hd_threhold %]
 		           [% IF op == '0' %]
 			   <option class="span1" selected="true"  value="[% op %]">不启用</option>
 		           [% ELSE %]

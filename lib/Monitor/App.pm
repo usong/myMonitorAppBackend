@@ -5,6 +5,7 @@ use Data::Dump qw(dump);
 use Encode;
 use Util::Basic;
 use Util::Tools;
+use Util::BackupTypeTool;
 use Util::ServerTypeTool;
 use DBIx::Class::Storage;
 use Util::TxnFlow;
@@ -438,8 +439,8 @@ get '/hd_paramcfg/:node_index' => sub {
 	}
 	else {
 		my $schema = Util::Basic->schema;
+		$schema->storage->debug(1);
 		my $nodeindex =  params->{node_index} ;
-		
 		my $node = $schema->resultset('Node')->search({
     			node_index => $nodeindex ,
   		})->first;
@@ -448,10 +449,46 @@ get '/hd_paramcfg/:node_index' => sub {
 		#
 		##########################
 	        #hd config information
-	        my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search({
+
+		#get current time
+		my $overtime = $schema->resultset('NodeHdCollect')->search({
 	        	node_index => $nodeindex ,
-	        });
-	        if(  scalar(@node_hdinfoset)  ){
+	        })->get_column('inserted_times')->max();
+
+		my @node_hdinfoset = $schema->resultset('NodeHdCollect')->search( 
+			{ 
+				'me.inserted_times' => $overtime ,
+				'hdinfos.node_index'	  => $nodeindex ,
+			} ,
+			{
+				 join     => 'hdinfos',
+				 prefetch => 'hdinfos',
+				 			
+			}
+		);
+	
+	        #my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search( 
+		#	{ 
+		#		'collects.inserted_times' => $overtime ,
+		#		'collects.node_index'	  => $nodeindex ,
+		#	} ,
+		#	{
+		#		 join     => 'collects',
+		#		 			
+		#	}
+		#);
+		#$node_hdinfoset->collects->all;
+	
+
+		#my @node_hdinfoset = $schema->resultset('NodeHdCollect')->search({
+		#	node_index 	=> $nodeindex ,
+		#	inserted_times  => $overtime  ,
+  		#})->search_related('NodeHdInfo', { node_index 	=> $nodeindex });
+			
+		#my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search({
+		#	node_index => $nodeindex ,
+		#});
+		if(  scalar(@node_hdinfoset)  ){
 	            template 'node_hdcfg.tt2',
 	            {
 	            	'node_hds'            =>  \@node_hdinfoset,
@@ -517,6 +554,9 @@ get '/backup_paramcfg/:node_index' => sub {
 			'ftp_port' 	  => ''  ,
 			'backup_time' 	  => ''  , 
 		};
+		#pre process 
+		my $serverhash = { };
+		
 	        for my $item ( @node_backupset ) {
 			$item->backup_dir(  Encode::decode('gb2312',$item->backup_dir ) );
 			$item->backup_prename(  Encode::decode('gb2312',$item->backup_prename ) );
@@ -525,15 +565,20 @@ get '/backup_paramcfg/:node_index' => sub {
 			$paramhash->{'ftp_username'} = $item->ftp_username  ; 
 			$paramhash->{'ftp_passwd'  } = $item->ftp_passwd  ; 
 			$paramhash->{'ftp_ip' 	 } = $item->ftp_ip  ; 
-			$paramhash->{'ftp_port' 	 } = $item->ftp_port  ; 
-			$paramhash->{'backup_time' } = $item->backup_time  ;   
+			$paramhash->{'ftp_port'  } = $item->ftp_port  ; 
+			$paramhash->{'backup_time' } = $item->backup_time  ;  
+			my $obj = new Util::BackupTypeTool;
+		        $item->backup_servers( $obj->getstring_from_typevalue( $item->backup_servers ) ); 
+			$serverhash->{ $item->backup_no } = $obj->get_hassvrtype_hash() || '000';
+			#dump( 'result='.$item->backup_servers );
 		}
-	
+		dump( $serverhash );
 
 		if( scalar( @node_backupset )  ){
 	            template 'node_backupcfg.tt2',
 	            {
 	            	'node_backupset'      =>  \@node_backupset,
+	            	'backupno_hash'       =>  $serverhash,
 	            	'totalinfo'           =>  $paramhash,
 	            	'node'                =>  $node ,
  	            };	 

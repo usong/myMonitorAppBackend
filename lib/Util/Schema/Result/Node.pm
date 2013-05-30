@@ -113,12 +113,10 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("node_index");
-__PACKAGE__->belongs_to( SYSINFO=>'Util::Schema::Result::NodeSystemInfo','node_index' );
+__PACKAGE__->belongs_to( SYSINFO=>'Util::Schema::Result::NodeSystemInfo','node_index');
 
-
-
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-29 15:11:03
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:q+s1JlSH5hKewXnq5qRaRg
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-30 16:11:44
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:MJ0G3QcuYbjQbjFsBr7dJg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
