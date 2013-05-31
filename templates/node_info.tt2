@@ -32,8 +32,8 @@
                   <th>操作系统信息</th>                  
                   <th>CPU型号</th>                  
                   <th>CPU数量</th>                  
-		  <th>物理内存大小</th>                  
-                  <th>磁盘大小</th>      
+		  <th>物理内存大小(M)</th>                  
+                  <th>磁盘大小(M)</th>      
                 </tr>
               </thead>
               <tbody>
@@ -42,7 +42,7 @@
                   <td>[% host_info.cpu_process_info %]</td>
                   <td>[% host_info.cpu_num %]</td>                  
                   <td>[% host_info.mm_size %]</td>
-                  <td>[% host_info.hd_size %]</td>                  
+                  <td>[% host_info.hd_size div 1024  %]</td>                  
                 </tr>
               </tbody>
             </table>

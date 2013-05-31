@@ -134,8 +134,11 @@ sub update_backuppara_path {
 			#dump(  $row->[4] );
 			#dump(  $row->[5] );
 			#dump(  $row->[6] );
+			my $time = $data->{"backuptime"};
+			$time =~ s/:/-/g;
+			dump(  $time );
 			$typeset->update( { 
-					'backup_time' 	  => $data->{"backuptime"} , 
+					'backup_time' 	  => $time , 
 					'backup_interval' => $row->[4]  , 
 					'del_interval' 	  => $row->[5]  , 
 					'ftp_path' 	  => $row->[3]  ,

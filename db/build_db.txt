@@ -9,6 +9,13 @@ create table nodes(
 	server_type     NUMBER(2)     /* 进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控*/
 );
 
+alter table NODES
+  add constraint NODE_INDEX primary key (NODE_INDEX)
+  using index 
+  tablespace SYSMONITOR_DATA
+;
+
+
 /* 监控时间调度配置表 */
 create table node_scheduling(	
 	node_index      VARCHAR2(32),
@@ -53,6 +60,11 @@ create table node_hd_collect (
 	hd_usepercent     VARCHAR2(6)       /* 已使用百分比 */ 
 	inserted_times    VARCHAR2(14),
 );
+alter table NODE_HD_COLLECT
+  add constraint NODE_HD_COLLINDEX primary key (NODE_INDEX, HD_NO, INSERTED_TIMES)
+  using index 
+  tablespace SYSMONITOR_DATA
+ ;
 
 
 /* 内存信息 */
@@ -67,6 +79,13 @@ create table node_mm_info (
 	inserted_times    VARCHAR2(14),
 
 );
+alter table NODE_HD_INFO
+  add constraint NODE_HD_INFOINDEX primary key (NODE_INDEX, HD_NO)
+  using index 
+  tablespace SYSMONITOR_DATA
+ ;
+
+
 /* 内存信息采集 */
 
 create table node_mm_collect (
@@ -139,6 +158,26 @@ create table node_event (
 	event_desc        VARCHAR2(512)   /* 事件描述 */
 )
 
+create table NODE_SYSTEM_INFO
+(
+  NODE_INDEX       VARCHAR2(32) not null,
+  CPU_NUM          NUMBER(6),
+  CPU_PROCESS_INFO VARCHAR2(64),
+  OPSYS_INFO       VARCHAR2(32),
+  MM_SIZE          VARCHAR2(12),
+  MM_FREE_SIZE     VARCHAR2(12),
+  HD_SIZE          VARCHAR2(12),
+  HD_FREE_SIZE     VARCHAR2(12)
+)
+
+
+alter table NODE_SYSTEM_INFO
+  add constraint SYS_NODE_INDEX primary key (NODE_INDEX)
+  using index 
+  tablespace SYSMONITOR_DATA
+  ;
+
+
 /* 监控类型 */
 		---------------------------------------------------
 		进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控
@@ -154,7 +193,7 @@ create table node_event (
 /*create db script*/
 
 create temporary tablespace sysmonitor_temp
-tempfile '/oradata/oradata/devdb/sysmonitor_temp.dbf'
+tempfile '/u01/app/oracle/oradata/monidb/sysmonitor_temp.dbf'
 size 32m
 autoextend on
 next 32m maxsize 2048m
@@ -162,7 +201,7 @@ extent management local;
 
 create tablespace sysmonitor_data
 logging
-datafile '/oradata/oradata/devdb/sysmonitor_data.dbf'
+datafile '/u01/app/oracle/oradata/monidb/sysmonitor_data.dbf'
 size 32m
 autoextend on
 next 32m maxsize 2048m

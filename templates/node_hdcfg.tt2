@@ -4,7 +4,7 @@
              <ul class="nav nav-list">
                 <li class="nav-header">功能项</li>
                 <li><a href="[% node_view %]/[% node.node_index %]">主机信息一览</a></li>
-                <li class="active"><a href="[% node_cfgview %]/[% node.node_index %]">主机监控配置项</a>
+                <li><a href="[% node_cfgview %]/[% node.node_index %]">主机监控配置项</a>
 					<ul>
 			  		    <li class="active"><a href="[% hd_paramcfg_url %]/[% node.node_index %]">磁盘监控参数配置</a></li>
 					    <li><a href="[% mm_paramcfg_url %]/[% node.node_index %]">内存监控参数配置</a></li>
@@ -32,9 +32,9 @@
               <thead>
                 <tr>
                   <th>分区挂接点</th>
-                  <th>分区大小</th>
-                  <th>已使用大小</th>
-                  <th>未使用大小</th>
+                  <th>分区大小(M)</th>
+                  <th>已使用大小(M)</th>
+                  <th>未使用大小(M)</th>
                   <th>已使用百分比</th>
 		  <th>已使用报警阀值</th>
                 </tr>
@@ -43,9 +43,9 @@
 		[% FOREACH hd IN node_hds %]
                 <tr>
                   <td value="[% hd.hd_no %]">[% hd.hd_no %]</td>
-                  <td>[% hd.hd_no_size %]</td>
-                  <td>[% hd.hd_used_size %]</td>
-                  <td>[% hd.hd_free_size %]</td>
+                  <td>[% hd.hd_no_size div 1024 %]</td>
+                  <td>[% hd.hd_used_size div 1024 %]</td>
+                  <td>[% hd.hd_free_size div 1024 %]</td>
 		  <td>[% hd.hd_usepercent %]</td>
 		  <td>
 	          <select name="threhold_items">

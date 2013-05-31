@@ -38,6 +38,8 @@
 	</ul>
 </div> 
 
+[% INCLUDE pager.tt2 %]
+
 
 
 

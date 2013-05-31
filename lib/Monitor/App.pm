@@ -30,17 +30,15 @@ hook before_template_render => sub {
     $tokens->{mm_paramcfg_url}   =  uri_for('/mm_paramcfg');#  /* mm_param */
     $tokens->{process_paramcfg_url}   =  uri_for('/process_paramcfg');  #/* process_param */
     $tokens->{backup_paramcfg_url}   =  uri_for('/backup_paramcfg');  #/* backup_param */
-
     $tokens->{param_backupconfig_url}   =  uri_for('/param_backupconfigok');#  /* hd_param config ok */
     $tokens->{param_hdconfig_url}   =  uri_for('/param_hdconfigok');#  /* hd_param config ok */
     $tokens->{param_processconfig_url}   =  uri_for('/param_processconfigok');#  /* process_param config ok */
     $tokens->{node_addconfig_url}   =  uri_for('/node_addprocess');#  /* process_param config ok */
     $tokens->{node_dataimport_url}   =  uri_for('/backup_dataimport');#  /* process_param config ok */
     $tokens->{node_dataimportok_url}   =  uri_for('/backup_dataimportok');#  /* process_param config ok */
-
 };
 
-any '/' => sub {
+get '/' => sub {
     	my $schema = Util::Basic->schema;
 	#my $job_rs = $schema->resultset('Node')->search( undef, {
         #	order_by => 'inserted_times DESC',
@@ -50,15 +48,38 @@ any '/' => sub {
 
 	my $job_rs = $schema->resultset('Node')->search( undef,
 	{   
-		       join=>'SYSINFO' , 
-		       prefetch => 'SYSINFO',
-		       rows => 8,
-		       page => 1, 
+		 order_by => 'inserted_times DESC',
+		 join=>'SYSINFO' , 
+		 prefetch => 'SYSINFO',
+		 rows => 7,
+		 page => 1, 
+	} 
+        );
+	my $total_count = $job_rs->pager->last_page;
+	template 'nodes.tt2',
+	{
+     	    'nodes'           => [ $job_rs->all ] ,
+     	    'pager'           => $job_rs->pager ,
+  	};
+};
+
+
+get qr{ /p.(\d+) }x => sub {
+	my ( $curpager ) = splat;
+	my $schema = Util::Basic->schema;
+    	my $job_rs = $schema->resultset('Node')->search( undef,
+	{   
+		 order_by => 'inserted_times DESC',
+		 join=>'SYSINFO' , 
+		 prefetch => 'SYSINFO',
+		 rows => 7,
+		 page => $curpager, 
 	} 
         );
 	template 'nodes.tt2',
 	{
      	    'nodes'           => [ $job_rs->all ] ,
+     	    'pager'           => $job_rs->pager ,
   	};
 };
 
@@ -466,20 +487,6 @@ get '/hd_paramcfg/:node_index' => sub {
 				 			
 			}
 		);
-	
-	        #my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search( 
-		#	{ 
-		#		'collects.inserted_times' => $overtime ,
-		#		'collects.node_index'	  => $nodeindex ,
-		#	} ,
-		#	{
-		#		 join     => 'collects',
-		#		 			
-		#	}
-		#);
-		#$node_hdinfoset->collects->all;
-	
-
 		#my @node_hdinfoset = $schema->resultset('NodeHdCollect')->search({
 		#	node_index 	=> $nodeindex ,
 		#	inserted_times  => $overtime  ,

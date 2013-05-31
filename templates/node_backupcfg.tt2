@@ -40,7 +40,7 @@
 	       	<div class="control-group">
 	    		<label class="control-label">备份时间[小时:分]</label>
 			<div class="controls">
-			<input id="timeselector" type="text" class="input-large" placeholder="点击选择执行时间"  value="[% totalinfo.backup_time %]">
+			<input id="timeselector" type="text" class="input-large" placeholder="点击选择执行时间"  value="[% totalinfo.backup_time.replace('-', ':') %]">
 			</div>
 		</div>
 	    
