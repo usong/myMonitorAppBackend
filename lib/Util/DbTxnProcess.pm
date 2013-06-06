@@ -4,6 +4,7 @@ use Moose;
 use Data::Dump qw/dump/;
 use POSIX qw(strftime); 
 use Util::BackupTypeTool;
+use Encode;
 sub insert_node_and_sysinfo {
 
 	my ( $self , $nodeindex , $nodesrow ,  $hdrowarray ,  $schema ) = @_;
@@ -13,13 +14,13 @@ sub insert_node_and_sysinfo {
 	eval {	
 		$schema->txn_begin();
 		#insert nodes table 
-
 		my $node = $schema->resultset('Node');
 		$node->create({
 		     'node_index' 	 => $nodesrow->{'node_index'},
 		     'monitor_ip'  	 => $nodesrow->{'server_ip'} ,
 		     'monitor_port'      => $nodesrow->{'port'},
-		     'alias'             => $nodesrow->{'hostname'},
+		     'alias'             => Encode::encode( 'gb2312' , Encode::decode( 'UTF-8',$nodesrow->{'hostname'} ) ),
+		     #'alias'             => $nodesrow->{'hostname'} ,
 		     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
 		     'running_status'    => $nodesrow->{'running_status'},
 		     'server_type'       => $nodesrow->{'server_type'}
@@ -136,7 +137,6 @@ sub update_backuppara_path {
 			#dump(  $row->[6] );
 			my $time = $data->{"backuptime"};
 			$time =~ s/:/-/g;
-			dump(  $time );
 			$typeset->update( { 
 					'backup_time' 	  => $time , 
 					'backup_interval' => $row->[4]  , 
@@ -149,6 +149,45 @@ sub update_backuppara_path {
 					'ftp_port' 	  => $data->{"ftpport"}  , 
 					'backup_servers'  => $row->[6]  , 
 			} );
+		}
+	};
+	if( $@ ) { 
+		print "Failed Manutiplate Database UpData or Insert,\n" ;
+		$schema->txn_rollback();
+		return 1;
+	} 
+	$schema->txn_commit();
+	return 0;
+}
+
+
+
+
+sub insert_process_info {
+
+	my ( $self ,$node_index, $filehandle , $schema ) = @_;
+	eval {	
+		$schema->txn_begin();
+		#insert nodes table 
+		my $ix = 1;
+		my $process = $schema->resultset('NodeProcessInfo');
+		my $typeset = $process->search({
+			node_index => $node_index ,
+		});	
+		$typeset->delete;
+		while( <$filehandle> ) {
+			dump( $_ );
+			$_ =~ s/\n//g;
+			dump( $_ );
+			$process->create({
+			     'node_index' 	 => $node_index,
+			     'process_no'        => $_,
+			     'process_desc'  	 => '0',
+			     'process_status'  	 => '0',
+			     'process_runnum'  	 => '0',
+			     'process_setnum'  	 => '0',
+			     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
+			});
 		}
 	};
 	if( $@ ) { 

@@ -15,6 +15,7 @@
 		<li><a href="#">数据导入</a>
 			<ul>
 				<li><a href="[% node_dataimport_url %]/[% node.node_index  %]">备份外部数据导入</a></li>
+				<li><a href="[% node_processimport_url %]/[% node.node_index %]">进程信息数据导入</a></li>
 			</ul>
 		</li>
               </ul>
@@ -131,9 +132,68 @@
     		  }  
     		  //alert(s);  
 	     };
-	     
+	     function form_check_IP(expression)    
+	     {
+	     	  var data = expression;
+   	     	  var re=/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;//正则表达式   
+   	     	  if( re.test(data) )   
+   	     	  {   
+   	     	      if( RegExp.$1<256 && RegExp.$2<256 && RegExp.$3<256 && RegExp.$4<256) 
+   	     	      	return true;   
+	     	  } 
+   	     	  return false;    
+             }
+             function form_check_num(expression)    
+             {
+             	   var data = expression;
+                   	var re=/^\d+$/;//正则表达式   
+                   	if( re.test(data) )   
+                   	{   
+                   	    return true;   
+             	   } 
+                   return false;    
+             }
+             function form_check_defined(expression)    
+             {
+             	   var data = expression;
+                   	if( data )   
+                   	{   
+                   	    return true;   
+             	   } 
+                	return false;    
+             }
+            function form_check_all(){	
+             	   if( !form_check_IP( $("#ftpip").val() ) ) {
+             	   	$("#alert_tip").attr("style","display : block");
+             	   	$("#alert_tip").find("h5").html("提示:\n请输入合法主机IP!") ;
+             	   	$("#alert_tip").attr("class" , "alert alert-error"); 
+             	   	return false;
+             	   }
+             	   if( !form_check_num( $("#ftpport").val() ) ) {
+             	   	$("#alert_tip").attr("style","display : block");
+             	   	$("#alert_tip").find("h5").html("提示:\n请输入合法的主机端口!") ;
+             	   	$("#alert_tip").attr("class" , "alert alert-error"); 
+             	   	return false;
+             	   }
+             	   if( !form_check_defined( $("#ftpuser").val() ) ) {
+             	   	$("#alert_tip").attr("style","display : block");
+             	   	$("#alert_tip").find("h5").html("提示:\n请输入FTP登陆用户名!") ;
+             	   	$("#alert_tip").attr("class" , "alert alert-error"); 
+             	   	return false;
+		   }
+		   if( !form_check_defined( $("#ftppwd").val() ) ) {
+             	   	$("#alert_tip").attr("style","display : block");
+             	   	$("#alert_tip").find("h5").html("提示:\n请输入FTP登陆密码!") ;
+             	   	$("#alert_tip").attr("class" , "alert alert-error"); 
+             	   	return false;
+             	   }
+		   return true;
+             }
 			
 	     $("#backupsave").click(function(){
+
+			if( !form_check_all() )
+				return false;
 	     		var msg =   
      	     		{   
 			   "node_index"   : $("#node_index").val(),   
@@ -186,8 +246,7 @@
 					$("#alert_tip").attr("style","display : block");
 					if( msg.status == 200) { 
 						var resp = JSON.parse( msg.response );
-						//alert( dump_obj( msg.response ) );
-						//alert(  resp.result );
+					
 						if( resp.result == "000000" ) {
 							$("#alert_tip").find("h5").html("提示:\n备份参数设置成功!") ;
 							$("#alert_tip").attr("class" , "alert alert-tip"); 

@@ -172,5 +172,16 @@ sub add_backupparamcfg {
 	return ( '000000' , 'succesfully!' );
 }
 
+#import processuppath
+sub add_processpath {
+	my ( $self , $nodeindex , $filehandle  ) = @_;
+	my  $schema = Util::Basic->schema;
+	my  $obj = new Util::DbTxnProcess;
+	if( $obj->insert_process_info( $nodeindex , $filehandle,   $schema  ) ) {
+		return ( '888888' , '1001_1005_1030_database process failed' );
+	}
+	return ( '000000' , 'succesfully!' );
+}	
+
 
 1;

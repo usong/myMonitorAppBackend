@@ -1,0 +1,84 @@
+<div id="container" style="width:300px; height:300px;"></div>
+<script type="text/javascript">
+$(function () {
+    	$(document).ready(function() {
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+    	});
+    	var chart;
+	function requestData() {
+
+	        setInterval(function() {
+    			$.ajax({
+				url: 'http://127.0.0.1:5000/ccc',
+				type: "POST",
+				async: false,
+				dataType: "json",
+				complete: function(resp) {
+					var result = JSON.parse( resp.response );
+            				var series = this.series[0];
+					// add the point
+            				series.addPoint(result.point, true, shift);
+				}
+			});
+		},5000);
+	}
+
+
+        
+        $('#container').highcharts({
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                
+                events: {
+	                load: requestData
+	            }
+                
+                
+            },
+            title: {
+                text: 'Live random data'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                title: {
+                    text: 'Value'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+	            name: 'Random data',
+	            data: []
+	    }]
+        });
+    });
+    
+});
+
+
+
+</script type="text/javascript">

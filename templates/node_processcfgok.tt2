@@ -15,6 +15,7 @@
 		<li><a href="#">数据导入</a>
 			<ul>
 				<li><a href="[% node_dataimport_url %]/[% node_index %]">备份外部数据导入</a></li>
+				<li><a href="[% node_processimport_url %]/[% node_index %]">进程信息数据导入</a></li>
 			</ul>
 		</li>
               </ul>

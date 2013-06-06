@@ -14,7 +14,8 @@
 		</li>
 		<li><a href="#">数据导入</a>
 			<ul>
-				<li><a href="[% node_dataimport_url %]/[% node_index %]">备份外部数据导入</a></li>
+				<li><a href="[% node_dataimport_url %]/[% node.node_index %]">备份外部数据导入</a></li>
+				<li><a href="[% node_processimport_url %]/[% node.node_index %]">进程信息数据导入</a></li>
 			</ul>
 		</li>
               </ul>
@@ -56,7 +57,6 @@
               </tbody>
       	   </table>
 	   <input type="hidden" name="node_index" value="[% node.node_index %]"></input> 
-	   <input type="file"   name="filename"> 
 	   <button type="submit" class="btn pull-center">保存</button>
 	   </form> 
 	   <div class="alert alert-error"><h5>提示:</h5>

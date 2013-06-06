@@ -1,4 +1,4 @@
-package Monitor::App;
+﻿package Monitor::App;
 use Dancer ':syntax';
 use Dancer::Plugin::Ajax;
 use Data::Dump qw(dump);
@@ -17,7 +17,8 @@ our $VERSION = '0.1';
 set 'views'  => path( Util::Basic->proot, 'templates' );
 set 'layout'  => path( Util::Basic->proot, 'templates' );
 set 'public' => path( Util::Basic->proot, 'public' );
-set serializer => 'JSON';
+set 'serializer' => 'JSON';
+#set 'environment' => 'production';
 
 hook before_template_render => sub {
     my $tokens = shift;
@@ -35,7 +36,10 @@ hook before_template_render => sub {
     $tokens->{param_processconfig_url}   =  uri_for('/param_processconfigok');#  /* process_param config ok */
     $tokens->{node_addconfig_url}   =  uri_for('/node_addprocess');#  /* process_param config ok */
     $tokens->{node_dataimport_url}   =  uri_for('/backup_dataimport');#  /* process_param config ok */
-    $tokens->{node_dataimportok_url}   =  uri_for('/backup_dataimportok');#  /* process_param config ok */
+    $tokens->{node_dataimportok_url}   =  uri_for('/backup_dataimportok');#  /* backup config ok */
+
+    $tokens->{node_processimport_url}   =  uri_for('/process_dataimport');#  /* backup config  */
+    $tokens->{node_processimportok_url}   =  uri_for('/process_dataimportok');#  /* process_param config ok */
 };
 
 get '/' => sub {
@@ -55,6 +59,9 @@ get '/' => sub {
 		 page => 1, 
 	} 
         );
+	
+
+
 	my $total_count = $job_rs->pager->last_page;
 	template 'nodes.tt2',
 	{
@@ -76,6 +83,9 @@ get qr{ /p.(\d+) }x => sub {
 		 page => $curpager, 
 	} 
         );
+	for my $item ( $job_rs->all ) {
+		$item->alias( '1' );
+	}
 	template 'nodes.tt2',
 	{
      	    'nodes'           => [ $job_rs->all ] ,
@@ -102,6 +112,19 @@ ajax '/param_backupconfigok'  => sub {
 	return { 
 		result => $rlt ne '0' x 6 ? $rlt : '0' x 6,
 	};	
+};
+
+get '/test' => sub {
+
+	template 'test.tt2';
+
+};
+
+ajax '/ccc'  => sub {
+	
+	return 	{
+     	    point  => [ int(rand(300)) ],
+  	};
 };
 
 #any '/test' => sub {
@@ -241,7 +264,6 @@ get '/node_add' => sub {
 };
 
 post '/node_addprocess' => sub {
-	dump( params);
 	my $failed = 0;
 	my $tip ;
 	if(  params->{nodeip} eq ""  ||   params->{nodealias} eq ""   ||   params->{nodeport} eq ""  ) {
@@ -314,7 +336,8 @@ any['get','post'] => '/node_getinfo' => sub {
 	}
 };
 get '/node_view/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	#if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -337,7 +360,7 @@ get '/node_view/:node_index' => sub {
 };
 
 get '/node_svrcfgview/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -367,7 +390,7 @@ get '/node_svrcfgview/:node_index' => sub {
 };
 
 post '/node_svrcfgokview' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -401,7 +424,7 @@ post '/node_svrcfgokview' => sub {
 
 #process running nums setting
 get '/process_paramcfg/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -429,7 +452,7 @@ get '/process_paramcfg/:node_index' => sub {
 
 #process_config ok
 post '/param_processconfigok' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -441,6 +464,7 @@ post '/param_processconfigok' => sub {
 		my $result = 0;	
 		#merge hd_no => threhold 
 		my %process_hash = Util::Tools->Array_Merge( @process_items , @process_setnums );
+	
 		my $resultset = $schema->resultset('NodeProcessInfo') ;
 		if( $resultset->update_process_setnums( $schema ,$nodeindex, \%process_hash ) ) { $result = 1 ; }
 
@@ -455,7 +479,7 @@ post '/param_processconfigok' => sub {
 
 #hard_drive threhold setting
 get '/hd_paramcfg/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -475,31 +499,34 @@ get '/hd_paramcfg/:node_index' => sub {
 		my $overtime = $schema->resultset('NodeHdCollect')->search({
 	        	node_index => $nodeindex ,
 	        })->get_column('inserted_times')->max();
-
-		my @node_hdinfoset = $schema->resultset('NodeHdCollect')->search( 
-			{ 
-				'me.inserted_times' => $overtime ,
-				'hdinfos.node_index'	  => $nodeindex ,
-			} ,
-			{
-				 join     => 'hdinfos',
-				 prefetch => 'hdinfos',
-				 			
-			}
-		);
-		#my @node_hdinfoset = $schema->resultset('NodeHdCollect')->search({
-		#	node_index 	=> $nodeindex ,
-		#	inserted_times  => $overtime  ,
-  		#})->search_related('NodeHdInfo', { node_index 	=> $nodeindex });
+		my @node_hdinfoset;
+		my $threholdflag  = 0;
+		if( $overtime ) {
+			@node_hdinfoset= $schema->resultset('NodeHdCollect')->search( 
+				{ 
+					'me.inserted_times' => $overtime ,
+					'hdinfos.node_index'	  => $nodeindex ,
+				} ,
+				{
+					 join     => 'hdinfos',
+					 prefetch => 'hdinfos',
+					 			
+				}
+			);
+			$threholdflag  = 1;
+		} else {
+			@node_hdinfoset = $schema->resultset('NodeHdInfo')->search({
+				node_index => $nodeindex ,
+			});
+		}
 			
-		#my @node_hdinfoset = $schema->resultset('NodeHdInfo')->search({
-		#	node_index => $nodeindex ,
-		#});
 		if(  scalar(@node_hdinfoset)  ){
 	            template 'node_hdcfg.tt2',
 	            {
 	            	'node_hds'            =>  \@node_hdinfoset,
 	            	'node'                =>  $node ,
+	            	'threholdflag'                =>  $threholdflag ,
+
 	            };	 
 	        } else {
 	            # #initial config 
@@ -510,7 +537,7 @@ get '/hd_paramcfg/:node_index' => sub {
 
 #hd_config ok
 post '/param_hdconfigok' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -539,7 +566,7 @@ post '/param_hdconfigok' => sub {
 
 };
 get '/backup_paramcfg/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -579,7 +606,7 @@ get '/backup_paramcfg/:node_index' => sub {
 			$serverhash->{ $item->backup_no } = $obj->get_hassvrtype_hash() || '000';
 			#dump( 'result='.$item->backup_servers );
 		}
-		dump( $serverhash );
+		#dump( $serverhash );
 
 		if( scalar( @node_backupset )  ){
 	            template 'node_backupcfg.tt2',
@@ -598,7 +625,7 @@ get '/backup_paramcfg/:node_index' => sub {
 
 #backup import setting
 get '/backup_dataimport/:node_index' => sub {
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -617,7 +644,7 @@ get '/backup_dataimport/:node_index' => sub {
 
 post '/backup_dataimportok' => sub {
 
-	if ( params->{node_index} =~ m/[~\^@\#&!\$\+_ ].*/g ) {
+	if ( params->{node_index} =~ m/\D.*/g ) {
 		forward "404.html" ;
 	}
 	else {
@@ -633,6 +660,48 @@ post '/backup_dataimportok' => sub {
 			$result = 1;
 		} 
 		template 'node_backimportcfgok.tt2',
+	       	{
+	        	'db_result'    =>  $result ,
+			'node_index'   =>  params->{node_index},
+	       	};
+	}
+};
+
+#process import setting
+get '/process_dataimport/:node_index' => sub {
+	if ( params->{node_index} =~ m/\D.*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex =  params->{node_index} ;
+	    	my $node = $schema->resultset('Node')->search({
+    			node_index => $nodeindex ,
+  		})->first; 
+
+	        template 'node_processimportcfg.tt2',
+	        {
+	        	'node'                =>  $node ,
+	        };	 
+	}
+};
+
+post '/process_dataimportok' => sub {
+
+	if ( params->{node_index} =~ m/\D.*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $uploads = request->uploads->{'filename'};
+		my $fh = $uploads->file_handle; 
+		my $result = 0;
+		my $obj = new Util::TxnFlow;
+		my ( $rlt , $msg )  = $obj->add_processpath( params->{node_index} , $fh );
+		if( $rlt ne '000000' ) {
+			redirect '500.html';
+			$result = 1;
+		} 
+		template 'node_processimportcfgok.tt2',
 	       	{
 	        	'db_result'    =>  $result ,
 			'node_index'   =>  params->{node_index},

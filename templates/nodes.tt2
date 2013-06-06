@@ -1,4 +1,4 @@
-<!-- thumbnails div -->
+﻿<!-- thumbnails div -->
 <div class="row-fluid">
 	<ul class="thumbnails" id="mythumbnails">  
 	[% FOREACH node IN nodes %]
@@ -19,7 +19,7 @@
 			<img src='[% public_resource %]/img/osx.PNG' style='width: 180px; height: 180px'>		
 		 [% END %]
 		 	<a href="[% public_resource %]/node_view/[% node.node_index %]"><div class='caption'><p class="text-info">
- 	         [% node.SYSINFO.opsys_info %]</p></div></a>
+ 	         [% node.monitor_ip %]</p></div></a>
 	      </div>
 	  </li>
 	[% END %]

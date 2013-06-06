@@ -15,6 +15,7 @@
 		<li><a href="#">数据导入</a>
 			<ul>
 				<li><a href="[% node_dataimport_url %]/[% node.node_index %]">备份外部数据导入</a></li>
+				<li><a href="[% node_processimport_url %]/[% node_index %]">进程信息数据导入</a></li>
 			</ul>
 		</li>
               </ul>
@@ -40,36 +41,78 @@
                 </tr>
               </thead>
               <tbody>
-		[% FOREACH hd IN node_hds %]
-                <tr>
-                  <td value="[% hd.hd_no %]">[% hd.hd_no %]</td>
-                  <td>[% hd.hd_no_size div 1024 %]</td>
-                  <td>[% hd.hd_used_size div 1024 %]</td>
-                  <td>[% hd.hd_free_size div 1024 %]</td>
-		  <td>[% hd.hd_usepercent %]</td>
-		  <td>
-	          <select name="threhold_items">
-		  <!--<option class="span1" value="[% hd.hd_threhold %]">[% hd.hd_threhold %]%</option>-->
-		  [% FOREACH op IN ['0' '70' '75' '80' '85' '90' ] %]
-		      [% IF op ==  hd.hdinfos.hd_threhold %]
-		           [% IF op == '0' %]
-			   <option class="span1" selected="true"  value="[% op %]">不启用</option>
-		           [% ELSE %]
-			   <option class="span1" selected="true"  value="[% op %]">[% op %]%</option>
-			   [% END %]
-		      [% ELSE %]
-		      	   [% IF op == '0' %]
-			   <option class="span1"  value="[% op %]">不启用</option>
-		           [% ELSE %]
-			   <option class="span1"  value="[% op %]">[% op %]%</option>
-			   [% END %]
-		      [% END %]
-		  [% END %]
-	          </select>
-	          </td>
-		  <td><input type="hidden"  name="hd_no_items" value="[% hd.hd_no %]"></input></td>
-                </tr>
+
+		[%  IF threholdflag ==  1 %]
+			[% FOREACH hd IN node_hds %]
+                	<tr>
+                	  <td value="[% hd.hd_no %]">[% hd.hd_no %]</td>
+                	  <td>[% hd.hd_no_size div 1024 %]</td>
+                	  <td>[% hd.hd_used_size div 1024 %]</td>
+                	  <td>[% hd.hd_free_size div 1024 %]</td>
+			  <td>[% hd.hd_usepercent %]%</td>
+			  <td>
+			  <select name="threhold_items">
+
+			  <!--<option class="span1" value="[% hd.hd_threhold %]">[% hd.hd_threhold %]%</option>-->
+			  [% FOREACH op IN ['0' '70' '75' '80' '85' '90' ] %]
+			      
+			      	[% IF op ==  hd.hdinfos.hd_threhold %]
+			      
+			     
+			           [% IF op == '0' %]
+				   <option class="span1" selected="true"  value="[% op %]">不启用</option>
+			           [% ELSE %]
+				   <option class="span1" selected="true"  value="[% op %]">[% op %]%</option>
+				   [% END %]
+			      [% ELSE %]
+			      	   [% IF op == '0' %]
+				   <option class="span1"  value="[% op %]">不启用</option>
+			           [% ELSE %]
+				   <option class="span1"  value="[% op %]">[% op %]%</option>
+				   [% END %]
+			      [% END %]
+			  [% END %]
+	        	  </select>
+	        	  </td>
+			  <td><input type="hidden"  name="hd_no_items" value="[% hd.hd_no %]"></input></td>
+                	</tr>
+			[% END %]
+		[% ELSE  %]
+			[% FOREACH hd IN node_hds %]
+                	<tr>
+                	  <td value="[% hd.hd_no %]">[% hd.hd_no %]</td>
+                	  <td>[% hd.hd_no_size div 1024 %]</td>
+                	  <td>[% hd.hd_used_size div 1024 %]</td>
+                	  <td>[% hd.hd_free_size div 1024 %]</td>
+			  <td>[% hd.hd_usepercent %]%</td>
+			  <td>
+			  <select name="threhold_items">
+			  [% FOREACH op IN ['0' '70' '75' '80' '85' '90' ] %]
+			      
+			      	[% IF op ==  hd.hd_threhold %]
+			      
+			     
+			           [% IF op == '0' %]
+				   <option class="span1" selected="true"  value="[% op %]">不启用</option>
+			           [% ELSE %]
+				   <option class="span1" selected="true"  value="[% op %]">[% op %]%</option>
+				   [% END %]
+			      [% ELSE %]
+			      	   [% IF op == '0' %]
+				   <option class="span1"  value="[% op %]">不启用</option>
+			           [% ELSE %]
+				   <option class="span1"  value="[% op %]">[% op %]%</option>
+				   [% END %]
+			      [% END %]
+			  [% END %]
+	        	  </select>
+	        	  </td>
+			  <td><input type="hidden"  name="hd_no_items" value="[% hd.hd_no %]"></input></td>
+                	</tr>
+			[% END %]
+
 		[% END %]
+		
               </tbody>
       	   </table>
 	   <input type="hidden" name="node_index" value="[% node.node_index %]"></input> 

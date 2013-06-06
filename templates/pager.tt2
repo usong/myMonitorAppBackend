@@ -1,0 +1,13 @@
+<div class="pagination pagination-centered">
+  <ul>
+    <li><a href="[% public_resource %]/p.[% pager.first_page %]">首页</a></li>
+    [% start_page = 1 %]
+    [% FOREACH page = [ start_page .. pager.last_page ] %]
+        <li[% IF page == pager.current_page %] class="active"[% END %]>
+        <a href='[% pmatches.0 %]/p.[% page %]'>[% page %]</a>
+    [% END %]
+    <li><a href="[% public_resource %]/p.[% pager.last_page %]">末页</a></li>
+  </ul>
+</div>
+
+
