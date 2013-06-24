@@ -11,13 +11,18 @@
 		  </div>
 		 [% IF (matches = node.SYSINFO.opsys_info.match('Linux') ) %] 
 		 	<img src='[% public_resource %]/img/linux.PNG' style='width: 180px; height: 180px'>
-		 [% ELSIF (matches = node.SYSINFO.opsys_info.match('Windows') )  %]
-		 	<img src='[% public_resource %]/img/windows.PNG' style='width: 180px; height: 180px'>
-		 [% ELSIF (matches = node.SYSIFNO.opsys_info.match('Aix') )  %]
-		 	<img src='[% public_resource %]/img/aix.PNG' style='width: 180px; height: 180px'>
 		 [% ELSE  %]
-			<img src='[% public_resource %]/img/osx.PNG' style='width: 180px; height: 180px'>		
+		 	[% IF (matches = node.SYSINFO.opsys_info.match('Windows') ) %] 
+		 		<img src='[% public_resource %]/img/windows.PNG' style='width: 180px; height: 180px'>
+		 	[% ELSE  %]
+				[% IF (matches = node.SYSINFO.opsys_info.match('AIX') ) %] 
+		 			<img src='[% public_resource %]/img/aix.PNG' style='width: 180px; height: 180px'>
+		 		[% ELSE  %]
+					<img src='[% public_resource %]/img/osx.PNG' style='width: 180px; height: 180px'>
+				[% END   %]		
+			[% END %]
 		 [% END %]
+		
 		 	<a href="[% public_resource %]/node_view/[% node.node_index %]"><div class='caption'><p class="text-info">
  	         [% node.monitor_ip %]</p></div></a>
 	      </div>
