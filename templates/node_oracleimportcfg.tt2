@@ -8,9 +8,9 @@
 		 <p class="lead">主机IP:<span> [% node.monitor_ip %]</span> </p>
 		 <p class="lead">监控端口:<span> [% node.monitor_port %]</span></p>
            <hr class="bs-docs-separator">
-           <h3>进程信息文件导入</h3>
+           <h3>ORACLE日志路径文件导入</h3>
            <hr class="bs-docs-separator">
-	   <form action="[% node_processimportok_url %]" method="post" enctype="multipart/form-data">
+	   <form action="[% node_oraclealertimportok_url %]" method="post" enctype="multipart/form-data">
 	   <input type="hidden" name="node_index" value="[% node.node_index %]"></input> 
 	   <div class="control-group warning">
  		<div class="controls">
@@ -23,8 +23,8 @@
 	   </div>
 	   </form> 
 	   <div class="alert alert-error"><h5>提示:</h5>
-		   <h6>导入新的进程信息文件，原有的进程配置参数将被清空,请慎重.</h6>
-		   <h6>导入进程信息文件，文件中每行存放一条j进程名.</h6>
+		   <h6>导入新的日志路径文件，原有的日志路径将被清空,请慎重.</h6>
+		   <h6>导入日志路径文件，文件中每行存放一条数据库日志路径.</h6>
 	   	   </div>
           </div>
         </div><!-- row-fluid -->

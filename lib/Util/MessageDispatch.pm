@@ -45,19 +45,24 @@ sub disptach {
         confess "not exist $txnType in plugins tables";
         return undef;		
     }
-    my $pluginname = $self->pluginroom->plugins->{ $txnType };
-    apply_all_roles( $self, $pluginname );
-    my $buf = $self->encode( $data );
-    
-    #say '####', $txnType,'###',$data;
-    #say '>>>>>>', length( $self->package );
-    #return undef unless( $self->comm( $buf ) ) ;
-    unless( $self->comm( $buf ) ) {
-	say '>>>>>> ',  'No recive a package';	
-	return undef;
-    } 
-    #say '>>>>>>',  $self->package;
-    return  $self->decode;
+    my $decode ;
+    eval {
+    	my $pluginname = $self->pluginroom->plugins->{ $txnType };
+    	apply_all_roles( $self, $pluginname );
+    	my $buf = $self->encode( $data );
+    	
+    	#say '####', $txnType,'###',$data;
+    	#say '>>>>>>', length( $self->package );
+    	#return undef unless( $self->comm( $buf ) ) ;
+    	unless( $self->comm( $buf ) ) {
+    	    say '>>>>>> ',  'No recive a package';	
+    	    return undef;
+    	} 
+    	#say '>>>>>>',  $self->package;
+    	$decode =  $self->decode;
+    };
+    if( $@ ){  return undef; }
+    return $decode;
     
     #return  $self->package;
     #my $buf = $self->txntypes->{ $txnType }->[0]->execute( $self, $data );

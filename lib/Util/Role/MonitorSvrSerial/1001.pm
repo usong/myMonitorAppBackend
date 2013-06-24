@@ -154,7 +154,15 @@ sub check_msgvalid {
             exists $data->{ 'running_status' } &&
             exists $data->{ 'server_type' }   &&
             exists $data->{ 'txntype' }    &&
-	    exists $data->{ 'hostname' } 
+	    exists $data->{ 'hostname' } && 
+	    exists $data->{ 'cpunum' } && 
+	    exists $data->{ 'cputype' } && 
+	    exists $data->{ 'opsys_info' } && 
+	    exists $data->{ 'mmsize' } && 
+	    exists $data->{ 'mmfreesize' } && 
+	    exists $data->{ 'hdsize' } && 
+	    exists $data->{ 'hdfreesize' }  
+
     ) {
 
             confess "msg invaild ,checking the datagram!" ;

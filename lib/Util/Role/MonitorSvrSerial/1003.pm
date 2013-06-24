@@ -12,7 +12,7 @@ sub get_Head_Format {
 }
 sub get_Body_Format { 
 	my $self = shift; 
-	return "A32 A15 A6 A64 A14 A2 A2" 
+	return "A32 A15 A6 A64 A14 A2 A2 A6 A64 A32 A12 A12 A12 A12" 
 }
 
 #############################
@@ -53,6 +53,13 @@ sub pre_bodypack {
 	'inserted_time'       => $data->{ 'inserted_time' },
 	'running_status'      => $data->{ 'running_status' },
 	'server_type'         => $data->{ 'server_type' },
+	'cpunum'              => $data->{ 'cpunum' },
+	'cputype'             => $data->{ 'cputype' },
+	'opsys_info'          => $data->{ 'opsys_info' },
+	'mmsize'              => $data->{ 'mmsize' },
+	'mmfreesize'          => $data->{ 'mmfreesize' },
+	'hdsize'              => $data->{ 'hdsize' },
+	'hdfreesize'          => $data->{ 'hdfreesize' },
     };
     say '1003', $self->get_Body_Format; 
     $self->MsgBody(
@@ -64,6 +71,13 @@ sub pre_bodypack {
 		    $body_hash->{'inserted_time'}, 
 		    $body_hash->{'running_status'}, 
 		    $body_hash->{'server_type'}, 
+		    $body_hash->{'cpunum'}, 
+		    $body_hash->{'cputype'}, 
+		    $body_hash->{'opsys_info' },
+		    $body_hash->{'mmsize'}, 
+		    $body_hash->{'mmfreesize'}, 
+		    $body_hash->{'hdsize'}, 
+		    $body_hash->{'hdfreesize'},
 	      )
     );
 }
@@ -94,6 +108,13 @@ sub pre_bodyunpack {
       $body_hash->{'inserted_time'}, 
       $body_hash->{'running_status'}, 
       $body_hash->{'server_type'}, 
+      $body_hash->{'cpunum'}, 
+      $body_hash->{'cputype'}, 
+      $body_hash->{'opsys_info'}, 
+      $body_hash->{'mmsize'}, 
+      $body_hash->{'mmfreesize'}, 
+      $body_hash->{'hdsize'}, 
+      $body_hash->{'hdfreesize'}, 
     ) = unpack( 'x44 '.$self->get_Body_Format , $data );
     return $body_hash;
 }
@@ -116,7 +137,7 @@ sub decode {
     my $self = shift;
     say 'I am decode_1003';
     return undef unless  $self->package ;
-    if( length( $self->package ) != 179 ) { return undef; }
+    if( length( $self->package ) != 329 ) { return undef; }
     my $hdhash   = $self->pre_bodyunpack( $self->package );
     my $bodyhash = $self->pre_headunpack( $self->package );
     dump( $hdhash );
@@ -135,7 +156,14 @@ sub check_msgvalid {
             exists $data->{ 'running_status' } &&
             exists $data->{ 'server_type' }   &&
             exists $data->{ 'txntype' }    &&
-	    exists $data->{ 'hostname' } 
+	    exists $data->{ 'hostname' }  &&
+	    exists $data->{ 'cpunum' } && 
+	    exists $data->{ 'cputype' } && 
+	    exists $data->{ 'opsys_info' } && 
+	    exists $data->{ 'mmsize' } && 
+	    exists $data->{ 'mmfreesize' } && 
+	    exists $data->{ 'hdsize' } && 
+	    exists $data->{ 'hdfreesize' }  
     ) {
 
             confess "msg invaild ,checking the datagram!" ;

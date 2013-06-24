@@ -24,7 +24,7 @@ sub add_node_and_initialinfo {
 		'running_status' => 0,
 		'server_type'    => 0,
 		'hostname'       => Encode::encode('UTF-8', $alias),
-		'cpunum'  	 => 0 ,
+		'cpunum'  	 => 0,
 		'cputype'        => 0,
 		'opsys_info'     => 0,
 		'mmsize'         => 0,
@@ -133,6 +133,13 @@ sub add_nodesvrtype {
 		'server_type'    => $svrtype,
 		'txntype'        => 1003,
 		'hostname'       => $node->alias,
+		'cpunum'  	 => 0,
+		'cputype'        => 0,
+		'opsys_info'     => 0,
+		'mmsize'         => 0,
+		'mmfreesize'     => 0,
+		'hdsize'         => 0,
+		'hdfreesize'     => 0,
 	};
 	my $result_1003 = $dp->disptach( undef, 1003, $data_1003 ); #1001  create a monitor server host
 	unless( $result_1003 ) {
@@ -183,5 +190,15 @@ sub add_processpath {
 	return ( '000000' , 'succesfully!' );
 }	
 
+#import processuppath
+sub add_oraclealertpath {
+	my ( $self , $nodeindex , $filehandle  ) = @_;
+	my  $schema = Util::Basic->schema;
+	my  $obj = new Util::DbTxnProcess;
+	if( $obj->insert_alertpath_info( $nodeindex , $filehandle,   $schema  ) ) {
+		return ( '888888' , '1001_1005_1030_database process failed' );
+	}
+	return ( '000000' , 'succesfully!' );
+}
 
 1;

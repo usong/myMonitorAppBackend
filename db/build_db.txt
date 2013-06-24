@@ -177,7 +177,11 @@ alter table NODE_SYSTEM_INFO
   tablespace SYSMONITOR_DATA
   ;
 
-
+create table node_oraclealertpath_info (
+	node_index	  VARCHAR2(32),     /* 监控节点唯一索引 */
+	logpath           VARCHAR2(256),     /* 挂接点名称 */
+	inserted_times    VARCHAR2(14),
+);
 /* 监控类型 */
 		---------------------------------------------------
 		进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控

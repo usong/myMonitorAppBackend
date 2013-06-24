@@ -1,15 +1,15 @@
 <div class="row-fluid">
           <div class="span3">
            <div class="well sidebar-nav">
-            	[% INCLUDE navigation_list.tt2 %] 
+             [% INCLUDE navigation_list.tt2 %]
             </div><!--/.well -->
           </div><!--/span-->
           <div class="span9">
 	    [%IF db_result == 0 %]
-            	<h3>监控子服务配置成功</h3>
+            	<h3>ORACLE日志路径文件导入成功</h3>
 		<hr class="bs-docs-separator">
 	    [% ELSE %]
-	        <h3>监控子服务配置失败，请联系管理员!</h3>
+	        <h3>ORACLE日志路径文件导入失败!</h3>
 		<hr class="bs-docs-separator">
 	    [% END %]
           </div>

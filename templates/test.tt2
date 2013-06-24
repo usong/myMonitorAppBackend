@@ -18,9 +18,8 @@ $(function () {
 				dataType: "json",
 				complete: function(resp) {
 					var result = JSON.parse( resp.response );
-            				var series = this.series[0];
-					// add the point
-            				series.addPoint(result.point, true, shift);
+            			
+            				chart.series[0].addPoint(result.point, true, true);
 				}
 			});
 		},5000);
@@ -28,53 +27,36 @@ $(function () {
 
 
         
-        $('#container').highcharts({
-            chart: {
-                type: 'spline',
-                animation: Highcharts.svg, // don't animate in old IE
-                marginRight: 10,
-                
-                events: {
-	                load: requestData
-	            }
-                
-                
-            },
+ chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'container',
+            defaultSeriesType: 'spline',
+            events: {
+                load: requestData
+            }
+        },
+        title: {
+            text: 'Live random data'
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150,
+            maxZoom: 20 * 1000
+        },
+        yAxis: {
+            minPadding: 0.2,
+            maxPadding: 0.2,
             title: {
-                text: 'Live random data'
-            },
-            xAxis: {
-                type: 'datetime',
-                tickPixelInterval: 150
-            },
-            yAxis: {
-                title: {
-                    text: 'Value'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                formatter: function() {
-                        return '<b>'+ this.series.name +'</b><br/>'+
-                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
-                        Highcharts.numberFormat(this.y, 2);
-                }
-            },
-            legend: {
-                enabled: false
-            },
-            exporting: {
-                enabled: false
-            },
-            series: [{
-	            name: 'Random data',
-	            data: []
-	    }]
-        });
+                text: 'Value',
+                margin: 80
+            }
+        },
+        series: [{
+            name: 'Random data',
+            data: []
+        }]
+    });        
+       
     });
     
 });

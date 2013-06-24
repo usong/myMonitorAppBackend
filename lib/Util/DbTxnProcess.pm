@@ -87,6 +87,8 @@ sub insert_backup_path {
 		$typeset->delete;
 		while( <$filehandle> ) {
 			my $backup = $schema->resultset('NodeBackupInfo');
+			$_ =~ s/\r?\n//g;
+			$_ =~ s/\x{FEFF}//ig;
 			$backup->create({
 			     'node_index' 	 => $node_index,
 			     'backup_no'         => $ix++,
@@ -176,9 +178,8 @@ sub insert_process_info {
 		});	
 		$typeset->delete;
 		while( <$filehandle> ) {
-			dump( $_ );
-			$_ =~ s/\n//g;
-			dump( $_ );
+			$_ =~ s/\r?\n//g;
+			$_ =~ s/\x{FEFF}//ig;
 			$process->create({
 			     'node_index' 	 => $node_index,
 			     'process_no'        => $_,
@@ -186,6 +187,38 @@ sub insert_process_info {
 			     'process_status'  	 => '0',
 			     'process_runnum'  	 => '0',
 			     'process_setnum'  	 => '0',
+			     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
+			});
+		}
+	};
+	if( $@ ) { 
+		print "Failed Manutiplate Database UpData or Insert,\n" ;
+		$schema->txn_rollback();
+		return 1;
+	} 
+	$schema->txn_commit();
+	return 0;
+}
+
+
+sub insert_alertpath_info {
+
+	my ( $self ,$node_index, $filehandle , $schema ) = @_;
+	eval {	
+		$schema->txn_begin();
+		#insert nodes table 
+		my $ix = 1;
+		my $process = $schema->resultset('NodeOraclealertpathInfo');
+		my $typeset = $process->search({
+			node_index => $node_index ,
+		});	
+		$typeset->delete;
+		while( <$filehandle> ) {
+			$_ =~ s/\r?\n//g;
+			$_ =~ s/\x{FEFF}//ig;
+			$process->create({
+			     'node_index' 	 => $node_index,
+			     'logpath'           => $_,
 			     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
 			});
 		}

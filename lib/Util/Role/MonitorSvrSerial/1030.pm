@@ -93,7 +93,7 @@ sub pre_bodyunpack {
     
     my $offset = 44 ;
     my $offstr ;
-    
+    no warnings 'numeric'; 
     $body_hash->{'rows'} = [];
     for ( 1..$head_hash->{'record_amount'} ) {
 	$offstr = 'x'.$offset;
@@ -143,6 +143,7 @@ sub decode {
     my $hdhash   = $self->pre_bodyunpack( $self->package );
     #my $bodyhash = $self->pre_headunpack( $self->package );
     #dump( $hdhash );
+    #say 'I am decode_1030 ending';
     return  $hdhash ;
 }
 

@@ -37,9 +37,11 @@ hook before_template_render => sub {
     $tokens->{node_addconfig_url}   =  uri_for('/node_addprocess');#  /* process_param config ok */
     $tokens->{node_dataimport_url}   =  uri_for('/backup_dataimport');#  /* process_param config ok */
     $tokens->{node_dataimportok_url}   =  uri_for('/backup_dataimportok');#  /* backup config ok */
-
     $tokens->{node_processimport_url}   =  uri_for('/process_dataimport');#  /* backup config  */
     $tokens->{node_processimportok_url}   =  uri_for('/process_dataimportok');#  /* process_param config ok */
+    $tokens->{node_oraclealertimport_url}   =  uri_for('/oraclelogpath_dataimport');#  /* logpath import  */
+    $tokens->{node_oraclealertimportok_url}   =  uri_for('/oraclelogpath_dataimportok');#  /* logpath import ok */
+    $tokens->{node_oraclealertinfo_url}   =  uri_for('/node_oraclealertinfo');#  /* logpath import ok */
 };
 
 get '/' => sub {
@@ -268,7 +270,7 @@ post '/node_addprocess' => sub {
 	my $tip ;
 	if(  params->{nodeip} eq ""  ||   params->{nodealias} eq ""   ||   params->{nodeport} eq ""  ) {
 	   	$failed = 1;
-		$tip    = "æç¤º:\næœªå¡«å†™å®Œæ•´ä¿¡æ¯,è¯·ç¡®è®¤å®Œå–„èŠ‚ç‚¹èµ„æ–™!",
+		$tip    = q{ "ÌáÊ¾:\nÎ´ÌîÐ´ÍêÕûÐÅÏ¢,ÇëÈ·ÈÏÍêÉÆ½Úµã×ÊÁÏ!" };
 	
 	} else {
 		my $schema = Util::Basic->schema;
@@ -278,7 +280,7 @@ post '/node_addprocess' => sub {
 		dump( 'count is '.$node );
     		if( $node ne 0 ) {
 			$failed  = 1;
-			$tip    = "æç¤º:\nè¯¥èŠ‚ç‚¹å·²è¢«æ·»åŠ ,è¯·è¾“å…¥æ–°èŠ‚ç‚¹ä¿¡æ¯!",
+			$tip    = q{ "ÌáÊ¾:\n¸Ã½ÚµãÒÑ±»Ìí¼Ó,ÇëÊäÈëÐÂ½ÚµãÐÅÏ¢!" };
 		} else {
 		    	# comm to server and get server information from monitor server
 			my $obj = new Util::TxnFlow ;
@@ -395,8 +397,8 @@ post '/node_svrcfgokview' => sub {
 	}
 	else {
 		my $nodeindex = params->{ node_index } ;
-		my @types =  params->{ types } ;
-		my @selected_items =  params->{ selected_items } ;
+		my @types =  ref params->{ types } eq 'ARRAY' ? params->{ types } : [ params->{ types } ];
+		my @selected_items = ref params->{ selected_items } eq 'ARRAY' ? params->{ selected_items } : [ params->{ selected_items } ] ;
 	        my %selected_tp_hash = Util::Tools->Array_Merge( @types , @selected_items );
 		my $value = Util::Tools->GetBitValue( %selected_tp_hash );
 		#dump( $nodeindex );
@@ -442,6 +444,7 @@ get '/process_paramcfg/:node_index' => sub {
 			{
 			 	'node_process'            =>  \@node_processset,
 			 	'node'                    =>  $node ,
+				'node_index'              =>  $nodeindex,
 			};	 
 		} else {
 		        #initial config 
@@ -459,12 +462,13 @@ post '/param_processconfigok' => sub {
 		my $schema = Util::Basic->schema;
 		my $nodeindex = params->{ node_index } ;
 		my $buf = undef;
-		my @process_items =  params->{ process_items } ;
-		my @process_setnums =  params->{ process_setnums } ;
+		#dump( ref params->{ process_setnums } );
+		my @process_items = ref params->{ process_items } eq 'ARRAY' ? params->{ process_items } : [ params->{ process_items } ] ;
+		my @process_setnums = ref params->{ process_setnums } eq 'ARRAY' ? params->{ process_setnums } : [ params->{ process_setnums } ] ;
 		my $result = 0;	
 		#merge hd_no => threhold 
 		my %process_hash = Util::Tools->Array_Merge( @process_items , @process_setnums );
-	
+		dump( %process_hash );	
 		my $resultset = $schema->resultset('NodeProcessInfo') ;
 		if( $resultset->update_process_setnums( $schema ,$nodeindex, \%process_hash ) ) { $result = 1 ; }
 
@@ -526,6 +530,7 @@ get '/hd_paramcfg/:node_index' => sub {
 	            	'node_hds'            =>  \@node_hdinfoset,
 	            	'node'                =>  $node ,
 	            	'threholdflag'                =>  $threholdflag ,
+			'node_index'   =>  $nodeindex,
 
 	            };	 
 	        } else {
@@ -546,12 +551,12 @@ post '/param_hdconfigok' => sub {
 		my $nodeindex = params->{ node_index } ;
 	
 		my $buf = undef;
-		my @hd_no_items =  params->{ hd_no_items } ;
-		my @threhold_items =  params->{ threhold_items } ;
+		my @hd_no_items = ref params->{ hd_no_items }  eq 'ARRAY' ? params->{ hd_no_items } : [ params->{ hd_no_items } ] ;
+		my @threhold_items = ref params->{ threhold_items } eq 'ARRAY' ? params->{ threhold_items } : [ params->{ threhold_items } ] ;
 		my $result = 0;	
 		#merge hd_no => threhold 
-		dump(@hd_no_items);
-		dump(@threhold_items );	
+		#dump(@hd_no_items);
+		#dump(@threhold_items );	
 		my %hd_hash = Util::Tools->Array_Merge( @hd_no_items , @threhold_items );
 
 		my $resultset = $schema->resultset('NodeHdInfo') ;
@@ -615,6 +620,7 @@ get '/backup_paramcfg/:node_index' => sub {
 	            	'backupno_hash'       =>  $serverhash,
 	            	'totalinfo'           =>  $paramhash,
 	            	'node'                =>  $node ,
+			'node_index'   	      =>  $nodeindex,
  	            };	 
 	        } else {
 	            forward "404.html" ;
@@ -638,6 +644,7 @@ get '/backup_dataimport/:node_index' => sub {
 	        template 'node_backimportcfg.tt2',
 	        {
 	        	'node'                =>  $node ,
+			'node_index'   	      =>  $nodeindex,
 	        };	 
 	}
 };
@@ -682,6 +689,7 @@ get '/process_dataimport/:node_index' => sub {
 	        template 'node_processimportcfg.tt2',
 	        {
 	        	'node'                =>  $node ,
+			'node_index'   	      =>  $nodeindex,
 	        };	 
 	}
 };
@@ -706,6 +714,72 @@ post '/process_dataimportok' => sub {
 	        	'db_result'    =>  $result ,
 			'node_index'   =>  params->{node_index},
 	       	};
+	}
+};
+
+
+#process import setting
+get '/oraclelogpath_dataimport/:node_index' => sub {
+	if ( params->{node_index} =~ m/\D.*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex =  params->{node_index} ;
+	    	my $node = $schema->resultset('Node')->search({
+    			node_index => $nodeindex ,
+  		})->first; 
+
+	        template 'node_oracleimportcfg.tt2',
+	        {
+	        	'node'                =>  $node ,
+			'node_index'   	      =>  $nodeindex,
+	        };	 
+	}
+};
+
+post '/oraclelogpath_dataimportok' => sub {
+	if ( params->{node_index} =~ m/\D.*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $uploads = request->uploads->{'filename'};
+		my $fh = $uploads->file_handle; 
+		my $result = 0;
+		my $obj = new Util::TxnFlow;
+		my ( $rlt , $msg )  = $obj->add_oraclealertpath( params->{node_index} , $fh );
+		if( $rlt ne '000000' ) {
+			redirect '500.html';
+			$result = 1;
+		} 
+		template 'node_oracleimportcfgok.tt2',
+	       	{
+	        	'db_result'    =>  $result ,
+			'node_index'   =>  params->{node_index},
+	       	};
+	}
+};
+
+
+get '/node_oraclealertinfo/:node_index' => sub {
+	if ( params->{node_index} =~ m/\D.*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex =  params->{node_index} ;
+	    	my $node = $schema->resultset('Node')->search({
+    			node_index => $nodeindex ,
+  		})->first; 
+		my @pathinfo = $schema->resultset('NodeOraclealertpathInfo')->search({
+    			node_index => $nodeindex ,
+  		});
+	        template 'node_oraalertinfo.tt2',
+	        {
+	        	'node'                =>  $node ,
+			'node_index'   	      =>  $nodeindex,
+			'paths'   	      =>  \@pathinfo,
+	        };	 
 	}
 };
 
