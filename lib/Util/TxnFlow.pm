@@ -158,10 +158,10 @@ sub add_nodesvrtype {
 }	
 #import backuppath
 sub add_backuppath {
-	my ( $self , $nodeindex , $filehandle  ) = @_;
+	my ( $self , $nodeindex ,   $content  ) = @_;
 	my  $schema = Util::Basic->schema;
 	my  $obj = new Util::DbTxnProcess;
-	if( $obj->insert_backup_path( $nodeindex , $filehandle,   $schema  ) ) {
+	if( $obj->insert_backup_path( $nodeindex ,  $content,  $schema  ) ) {
 		return ( '888888' , '1001_1005_1030_database process failed' );
 	}
 	return ( '000000' , 'succesfully!' );

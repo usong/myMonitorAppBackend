@@ -5,6 +5,7 @@ use Data::Dump qw/dump/;
 use POSIX qw(strftime); 
 use Util::BackupTypeTool;
 use Encode;
+
 sub insert_node_and_sysinfo {
 
 	my ( $self , $nodeindex , $nodesrow ,  $hdrowarray ,  $schema ) = @_;
@@ -75,7 +76,7 @@ sub insert_node_and_sysinfo {
 
 sub insert_backup_path {
 
-	my ( $self ,$node_index, $filehandle , $schema ) = @_;
+	my ( $self ,$node_index , $content, $schema ) = @_;
 	eval {	
 		$schema->txn_begin();
 		#insert nodes table 
@@ -85,17 +86,19 @@ sub insert_backup_path {
 			node_index => $node_index ,
 		});	
 		$typeset->delete;
-		while( <$filehandle> ) {
+		$content = Encode::decode("gb2312",$content);
+		dump( $content );
+		my @lines = split( "\r\n" , $content );
+		for my $line ( @lines ) {
 			my $backup = $schema->resultset('NodeBackupInfo');
-			$_ =~ s/\r?\n//g;
-			$_ =~ s/\x{FEFF}//ig;
+			$line = Encode::encode( 'gb2312' ,  $line  );
 			$backup->create({
 			     'node_index' 	 => $node_index,
 			     'backup_no'         => $ix++,
 			     'backup_servers'  	 => '0',
 			     'backup_time'  	 => '00:00',
 			     'backup_prename'  	 => '/',
-			     'backup_dir'  	 => $_,
+			     'backup_dir'  	 =>  $line ,
 			     'backup_interval'   => '0',
 			     'ftp_username'      => '',
 			     'ftp_passwd'        => '',
@@ -105,6 +108,26 @@ sub insert_backup_path {
 			     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
 			});
 		}
+		#while( <$filehandle> ) {
+		#	my $backup = $schema->resultset('NodeBackupInfo');
+		#	$_ =~ s/\r?\n//g;
+		#	$_ =~ s/\x{FEFF}//ig;
+		#	$backup->create({
+		#	     'node_index' 	 => $node_index,
+		#	     'backup_no'         => $ix++,
+		#	     'backup_servers'  	 => '0',
+		#	     'backup_time'  	 => '00:00',
+		#	     'backup_prename'  	 => '/',
+		#	     'backup_dir'  	 => $_,
+		#	     'backup_interval'   => '0',
+		#	     'ftp_username'      => '',
+		#	     'ftp_passwd'        => '',
+		#	     'ftp_ip'       	 => '',
+		#	     'ftp_path'        	 => '/',
+		#	     'del_interval'      => '0',
+		#	     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
+		#	});
+		#}
 	};
 	if( $@ ) { 
 		print "Failed Manutiplate Database UpData or Insert,\n" ;

@@ -439,6 +439,7 @@ get '/process_paramcfg/:node_index' => sub {
         	my @node_processset = $schema->resultset('NodeProcessInfo')->search({
     			node_index => $nodeindex ,
   		})->all;
+		
 	        if(  scalar( @node_processset )  ){
 			template 'node_processcfg.tt2',
 			{
@@ -658,10 +659,12 @@ post '/backup_dataimportok' => sub {
 		my $uploads = request->uploads->{'filename'};
 		#dump( $uploads );
 		#dump( request->uri_base );
-		my $fh = $uploads->file_handle; 
+		#my $fh = $uploads->file_handle; 
+		#my $content = $uploads->content( ':utf8'  );
+		my $content = $uploads->content ;
 		my $result = 0;
 		my $obj = new Util::TxnFlow;
-		my ( $rlt , $msg )  = $obj->add_backuppath( params->{node_index} , $fh );
+		my ( $rlt , $msg )  = $obj->add_backuppath( params->{node_index} ,  $content );
 		if( $rlt ne '000000' ) {
 			redirect '500.html';
 			$result = 1;
