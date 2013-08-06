@@ -139,7 +139,8 @@ create table node_backup_info (
 	ftp_port 	  VARCHAR2(6),   
 	ftp_path 	  VARCHAR2(128),   
 	del_interval      NUMBER(4),       /* 删除项 */
-	inserted_times    VARCHAR2(14)    
+	inserted_times    VARCHAR2(14),
+	flag              VARCHAR2(2)   
 )
 /* 节点备份结果采集 */
 create table node_backup_collect (
@@ -182,21 +183,31 @@ create table node_oraclealertpath_info (
 	logpath           VARCHAR2(256),     /* 挂接点名称 */
 	inserted_times    VARCHAR2(14),
 );
+
+create table node_bustxndata_info (
+	node_index	  VARCHAR2(32),     /* 监控节点唯一索引 */
+	busdata           VARCHAR2(256),     /* 挂接点名称 */
+	inserted_times    VARCHAR2(14),
+);
+create table node_bustxndata_info (
+	node_index	  VARCHAR2(32),     /* 监控节点唯一索引 */
+	busdata_set    	  VARCHAR2(12),     /* 运行数量 */
+	busdata_time      VARCHAR2(12),     /* 运行时间 */
+);
 /* 监控类型 */
-		---------------------------------------------------
-		进程监控 内存 磁盘监控 备份监控 数据库监控 业务监控
-		---------------------------------------------------
-索引index	1        2      3        4        5           6  
-类型值value	1        2      4        8        16          32  
-		---------------------------------------------------
-例如: 
-进程监控 内存监控 两项监控  servertyp Value = sum (value of index ) = 1 + 2 = 3;
-进程监控 内存 磁盘监控 备份监控 数据库监控  servertyp Value = 1 + 2 + 4 + 8 + 15 = 31
+---------------------------------------------------
+进程监控 内存 磁盘监控 备份监控 数据库日志监控 业务监控
+---------------------------------------------------
+索引index 1 2 3 4 5 6
+类型值value 1 2 4 8 16 32
+---------------------------------------------------
+例如:
+进程监控 内存监控 两项监控 servertyp Value = sum (value of index ) = 1 + 2 = 3;
+进程监控 内存 磁盘监控 备份监控 数据库监控 servertyp Value = 1 + 2 + 4 + 8 + 15 = 31
 
 
-/*create db script*/
 
-create temporary tablespace sysmonitor_temp
+create table node_create temporary tablespace sysmonitor_temp
 tempfile '/u01/app/oracle/oradata/monidb/sysmonitor_temp.dbf'
 size 32m
 autoextend on

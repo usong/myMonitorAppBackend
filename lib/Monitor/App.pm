@@ -42,6 +42,8 @@ hook before_template_render => sub {
     $tokens->{node_oraclealertimport_url}   =  uri_for('/oraclelogpath_dataimport');#  /* logpath import  */
     $tokens->{node_oraclealertimportok_url}   =  uri_for('/oraclelogpath_dataimportok');#  /* logpath import ok */
     $tokens->{node_oraclealertinfo_url}   =  uri_for('/node_oraclealertinfo');#  /* logpath import ok */
+
+    $tokens->{busdata_paramcfg_url}   =  uri_for('/busdata_paramcfg');#  /* logpath import ok */
 };
 
 get '/' => sub {
@@ -61,13 +63,17 @@ get '/' => sub {
 		 page => 1, 
 	} 
         );
+	my @nodes = $job_rs->all;
 	
-
+	foreach my $item ( @nodes ) {
+		$item->alias( Encode::decode('gb2312',$item->alias ) );
+	}
 
 	my $total_count = $job_rs->pager->last_page;
 	template 'nodes.tt2',
 	{
-     	    'nodes'           => [ $job_rs->all ] ,
+            #'nodes'           => [ $job_rs->all ] ,
+     	    'nodes'           => \@nodes ,
      	    'pager'           => $job_rs->pager ,
   	};
 };
@@ -782,6 +788,26 @@ get '/node_oraclealertinfo/:node_index' => sub {
 	        	'node'                =>  $node ,
 			'node_index'   	      =>  $nodeindex,
 			'paths'   	      =>  \@pathinfo,
+	        };	 
+	}
+};
+
+get '/busdata_paramcfg/:node_index' => sub {
+
+	if ( params->{node_index} =~ m/\D.*/g ) {
+		forward "404.html" ;
+	}
+	else {
+		my $schema = Util::Basic->schema;
+		my $nodeindex =  params->{node_index} ;
+	    	my $node = $schema->resultset('Node')->search({
+    			node_index => $nodeindex ,
+  		})->first; 
+	
+	        template 'node_busdatacfg.tt2',
+	        {
+	        	'node'                =>  $node ,
+			'node_index'   	      =>  $nodeindex,		
 	        };	 
 	}
 };

@@ -24,7 +24,7 @@
 		 [% END %]
 		
 		 	<a href="[% public_resource %]/node_view/[% node.node_index %]"><div class='caption'><p class="text-info">
- 	         [% node.monitor_ip %]</p></div></a>
+ 	         [% node.alias %]-[% node.monitor_ip %]</p></div></a>
 	      </div>
 	  </li>
 	[% END %]
