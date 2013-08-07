@@ -154,12 +154,7 @@ sub update_backuppara_path {
 				node_index => $node_index ,
 				backup_no  => $row->[0]  ,
 			});
-			#dump(  $row->[0] );
-			#dump(  $row->[2] );
-			#dump(  $row->[3] );
-			#dump(  $row->[4] );
-			#dump(  $row->[5] );
-			#dump(  $row->[6] );
+			
 			my $time = $data->{"backuptime"};
 			$time =~ s/:/-/g;
 			$typeset->update( { 
@@ -245,6 +240,35 @@ sub insert_alertpath_info {
 			     'inserted_times'    => strftime( "%Y%m%d%H%M%S", localtime(time) ),
 			});
 		}
+	};
+	if( $@ ) { 
+		print "Failed Manutiplate Database UpData or Insert,\n" ;
+		$schema->txn_rollback();
+		return 1;
+	} 
+	$schema->txn_commit();
+	return 0;
+}
+
+
+sub insert_busdata {
+	my ( $self ,$node_index , $data, $schema ) = @_;
+	eval {	
+		$schema->txn_begin();
+		my $ix = 1;
+		my $busdata = $schema->resultset('NodeBustxndataInfo');
+		my $typeset = $busdata->search({
+			node_index => $node_index ,
+		});	
+		$typeset->delete;
+		for my $row ( @{ $data->{'row'} } ) {
+			$busdata->create({
+			     'node_index' 	 => $node_index,
+			     'busdata_set'       => $row->[1],
+			     'busdata_time'  	 => $row->[0],
+			});
+		}
+	
 	};
 	if( $@ ) { 
 		print "Failed Manutiplate Database UpData or Insert,\n" ;

@@ -44,6 +44,7 @@ hook before_template_render => sub {
     $tokens->{node_oraclealertinfo_url}   =  uri_for('/node_oraclealertinfo');#  /* logpath import ok */
 
     $tokens->{busdata_paramcfg_url}   =  uri_for('/busdata_paramcfg');#  /* logpath import ok */
+    $tokens->{param_busdataconfig_url}   =  uri_for('/param_busdataconfigok');#  /* hd_param config ok */
 };
 
 get '/' => sub {
@@ -800,17 +801,50 @@ get '/busdata_paramcfg/:node_index' => sub {
 	else {
 		my $schema = Util::Basic->schema;
 		my $nodeindex =  params->{node_index} ;
-	    	my $node = $schema->resultset('Node')->search({
+		my $node = $schema->resultset('Node')->search({
     			node_index => $nodeindex ,
   		})->first; 
+	    	my @buddatas = $schema->resultset('NodeBustxndataInfo')->search(
+			{
+    				node_index => $nodeindex ,
+			},
+		       	{
+				order_by => 'busdata_time ASC',
+			},
+  		); 
+		my $hasvl ;
+		dump( 'busdata_paramcfg' );
+		#dump( $buddatas );
+		dump( 'busdata_paramcfg' );
+		$hasvl = scalar @buddatas;
 	
-	        template 'node_busdatacfg.tt2',
-	        {
-	        	'node'                =>  $node ,
-			'node_index'   	      =>  $nodeindex,		
-	        };	 
+		template 'node_busdatacfg.tt2',
+	       	{
+			'node'                =>  $node ,
+	       		'busdatas'            =>  \@buddatas ,
+			'node_index'   	      =>  $nodeindex,	
+			'nums'                 =>  $hasvl,	
+	       	};	
+	       
 	}
 };
+
+# busdata config route
+ajax '/param_busdataconfigok'  => sub {
+	my $data = from_json( request->body );
+	dump( 'param_busdataconfigok' );
+	dump( $data );
+	dump( 'param_busdataconfigok' );
+	my $nodeindex = $data->{ "node_index" } ;
+	my $obj = new Util::TxnFlow ;
+	my ( $rlt , $msg ) = $obj->add_busdataparamcfg( $nodeindex ,$data );
+	
+	return { 
+		result => $rlt ne '0' x 6 ? $rlt : '0' x 6,
+	};	
+	return { result => '000000' };	
+};
+
 
 true;
 

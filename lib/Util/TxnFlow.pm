@@ -200,5 +200,26 @@ sub add_oraclealertpath {
 	}
 	return ( '000000' , 'succesfully!' );
 }
+#add busdata param
+sub add_busdataparamcfg {
+	my ( $self , $nodeindex , $data  ) = @_;
+	my  $schema = Util::Basic->schema;
+	my  $obj = new Util::DbTxnProcess;
+
+
+	my $node = $schema->resultset('NodeBackupInfo')->search({
+    			node_index => $nodeindex ,
+  	});
+	return ( '999999' , 'not found' )   
+		unless( $node->count );
+
+	if( $obj->insert_busdata( $nodeindex , $data,   $schema  ) ) {
+		return ( '888888' , 'insert_busdata param failed' );
+	}
+	return ( '000000' , 'succesfully!' );
+
+
+
+}
 
 1;

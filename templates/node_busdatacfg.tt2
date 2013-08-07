@@ -19,64 +19,171 @@
 	    <form class="form-horizontal">	
              <hr class="bs-docs-separator">
 	     <p><button id ="buttion_add" class="btn btn-info" type="button">+</button></p>
-	      <table class="table table-striped table-hover table-condensed" id="backupinfo">
+
+	     
+	     
+	      <table class="table table-striped table-hover table-condensed" id="busdatainfo">
               <thead>
 	        <tr>
-		  <th>序号</th>	  
 		  <th>监控时间点</th>
-		  <th>实时数据阀值</th>
+		  <th>实时数据阀值(元)</th>
 		  <th>操作</th>
                 </tr>
-              </thead>
-              <tbody id="list_rows">
-		<tr id="1">
-			<td>1</td>
-			<td><input type="text"  class="input-small"></td>
-			<td><input type="text"  class="input-small"></td>
+	      </thead>
+	      [% IF !nums  %]  
+	      <tbody id="list_norows"><tr><td>未配置监控数据</td></tr></tbody>
+	      [% ELSE %]
+	      <tbody id="list_rows">
+		    [% FOREACH busrow IN busdatas %] 
+			<tr>
+				<td><input type="text"  class="input-small" attribute="time" value=[% busrow.busdata_time %]></input></td>
+				<td><input type="text"  class="input-small" value=[% busrow.busdata_set %]></input></td>
 			<td>
 				<button id ="buttion_del" class="btn btn-danger" type="button" value="1">删除</button>
 		        </td>
-		</tr>
+			</tr>
+		    [%  END  %]
 	      </tbody>
-      	     </table>
-	     <button type="submit" class="btn pull-center" id="backupsave">保存配置</button>
+	     [% END %]
+	     </table>
+	     </form>
+	     <button class="btn pull-center" id="busdatasave">保存配置</button>
 	     <br /><br />
 	     <div class="alert" id="alert_tip" style="display : none"><h5></h5></div>
 	     <input type="hidden" id="node_index" value="[% node.node_index %]"></input> 
+     	     
 	</section>
       </div><!-- second -->
 
   </div><!-- row-fluid -->
 
   <script type="text/javascript">
-	function deleterow(k){
-		$(k).parent().remove();    
-	    	
-	}
+	var globalDataCount = [% nums %];
 
 	$(document).ready(function(){
-	    
+	     function form_check_time(expression)  {
+	      
+	     	  var data = expression;
+		  alert( data );
+   	     	  var re=/^(\d\d):(\d\d):(\d\d)$/;//正则表达式   
+   	     	  if( re.test(data) )   
+   	     	  {   
+		  	if( ( RegExp.$1 < 24 && RegExp.$1 >= 0 ) &&
+		      	    ( RegExp.$2 < 60 && RegExp.$2 >= 0 ) &&
+		     	    ( RegExp.$3 < 60 && RegExp.$3 >= 0 )  ) {
+		  	
+   	     	      		return true;   
+	     	  	} 
 
-	     $("#buttion_add").click(function(){ 
-		     var globalDataCount = 0;
-		     globalDataCount = parseInt( $('#list_rows tr:last').find("td:first").text() ) + 1 ;
-		     if( globalDataCount > 8 ) {
+              	  }
+		  return false;
+	      };
+	      function dump_obj(myObject) {  
+    		  	var s = "";  
+    		  	for (var property in myObject) {  
+    		  	 s = s + "\n "+property +": " + myObject[property] ;  
+    		  	}  
+    		  	
+	      };
+	      $("#buttion_add").click(function(){ 
+		     $("#list_norows").remove();
+		     $("#busdatainfo").append( "<tbody id=\"list_rows\"></tbody>" );	
+		     //globalDataCount = parseInt( $('#list_rows tr:last').find("td:first").text() ) + 1 ;
+
+		     if( globalDataCount >= 8 ) {
 		     	$("#alert_tip").attr("style","display : block");
 			$("#alert_tip").find("h5").html("提示:\n配置数最大8个,请合理配置!") ;
 			$("#alert_tip").attr("class" , "alert alert-error"); 
 			return false;
 		     }
-		     var string = "<tr id=\"" + globalDataCount + "\"><td>" + globalDataCount  + "</td>\n"+
-		        "<td><input type=\"text\"  class=\"input-small\" value=\"\"></td>"+
+		     globalDataCount++;
+		     var string = "<tr id=\"" + globalDataCount + "\">"+
+		        "<td><input type=\"text\"  class=\"input-small\" value=\"\" attribute=\"time\"></td>"+
 		        "<td><input type=\"text\"  class=\"input-small\" value=\"\"></td>"+
 		        "<td><button id=\"buttion_del\" class=\"btn btn-danger\" type=\"button\"  value=" + globalDataCount + ">删除</button></td>";
-		     $("#list_rows").append( string );
+			$("#list_rows").append( string );
+		     
 	     });
 	     
 	     $("#buttion_del").live('click', function() {
-	        	$(this).parents('tr').remove();
+		     $(this).parents('tr').remove();
+		     globalDataCount--;
+		     alert( $(this).parents('tbody tr' ));
+		     if( !globalDataCount ) {
+		     	$("#list_rows").remove();
+			$("#busdatainfo").append( "<tbody id=\"list_norows\"><tr><td>未配置监控数据</td></tr></tbody>" );
+		     }
 	     });  
-	     
+
+
+	     $("#busdatasave").click(function(){
+			$("#alert_tip").attr("style","display : none");
+	     		var msg =   
+     	     		{   
+			   "node_index"   : $("#node_index").val(),   
+	     		   "row"          : new Array(),
+			}   
+			var ix = 0;	 
+			var rowarray ;
+			$("#list_rows").find("tr").each( function(){
+				rowarray = undefined;
+				$(this).find("td").each( function(index){
+					if( index == 0 ) { rowarray = new Array(); }
+					if( $(this).children().length > 0 )   
+					{   
+						if( $(this).children("input").attr("type") == "text" ) {
+							if( $(this).children("input").attr("attribute") == "time" )
+							{
+								if( !form_check_time( $(this).children("input").val() ) ) {
+									$("#alert_tip").attr("style","display:block");
+									$("#alert_tip").find("h5").html("提示:\n配置时间格式不正确,请重新配置!") ;
+									$("#alert_tip").attr("class" , "alert alert-error"); 
+									alert('here....');
+									return false;
+								}
+								rowarray[index] = $(this).children("input").val();
+							} else {
+								rowarray[index] = $(this).children("input").val();
+							}
+						
+						} 
+					} else {
+						
+						rowarray[index] = $(this).text();
+					}
+				});
+				msg.row[ix] = rowarray;
+				ix++;
+			});
+			dump_obj( msg );
+
+			var request = $.ajax({
+				url: "[% param_busdataconfig_url %]",
+				type: "POST",
+				data: JSON.stringify(msg),
+				async: false,
+				dataType: "json",
+				complete: function(msg) {
+					$("#alert_tip").attr("style","display : block");
+					if( msg.status == 200) { 
+						var resp = JSON.parse( msg.response );
+					
+						if( resp.result == "000000" ) {
+							$("#alert_tip").find("h5").html("提示:\n公交数据监控参数设置成功!") ;
+							$("#alert_tip").attr("class" , "alert alert-tip"); 
+						} else {
+							$("#alert_tip").find("h5").html("提示:\n公交数据监控设置失败,请重试!") ;
+							$("#alert_tip").attr("class" , "alert alert-error"); 
+						}
+					} else {
+						$("#alert_tip").find("h5").html("提示:\n同主服务通讯失败,请重试!") ;
+						$("#alert_tip").attr("class" , "alert alert-error"); 
+					}
+  				}
+				
+			});
+			
+	    });
   	});
 </script>	
       
